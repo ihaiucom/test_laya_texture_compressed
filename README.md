@@ -1,0 +1,2 @@
+# test_laya_texture_compressed
+测试Laya图片压缩
