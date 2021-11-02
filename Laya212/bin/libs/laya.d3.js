@@ -6587,10 +6587,11 @@
 	            this._children[i]._onWorldPositionRotationTransform();
 	    }
 	    _onWorldPositionScaleTransform() {
-	        if (!this._getTransformFlag(Transform3D.TRANSFORM_WORLDMATRIX) || !this._getTransformFlag(Transform3D.TRANSFORM_WORLDPOSITION) || !this._getTransformFlag(Transform3D.TRANSFORM_WORLDSCALE)) {
+			// TODO 缩放导致渲染面反了
+	        // if (!this._getTransformFlag(Transform3D.TRANSFORM_WORLDMATRIX) || !this._getTransformFlag(Transform3D.TRANSFORM_WORLDPOSITION) || !this._getTransformFlag(Transform3D.TRANSFORM_WORLDSCALE)) {
 	            this._setTransformFlag(Transform3D.TRANSFORM_WORLDMATRIX | Transform3D.TRANSFORM_WORLDPOSITION | Transform3D.TRANSFORM_WORLDSCALE, true);
 	            this.event(Laya.Event.TRANSFORM_CHANGED, this._transformFlag);
-	        }
+	        // }
 	        for (var i = 0, n = this._children.length; i < n; i++)
 	            this._children[i]._onWorldPositionScaleTransform();
 	    }
@@ -6611,10 +6612,11 @@
 	            this._children[i]._onWorldPositionRotationTransform();
 	    }
 	    _onWorldScaleTransform() {
-	        if (!this._getTransformFlag(Transform3D.TRANSFORM_WORLDMATRIX) || !this._getTransformFlag(Transform3D.TRANSFORM_WORLDSCALE)) {
+			// TODO 缩放导致渲染面反了
+	        // if (!this._getTransformFlag(Transform3D.TRANSFORM_WORLDMATRIX) || !this._getTransformFlag(Transform3D.TRANSFORM_WORLDSCALE)) {
 	            this._setTransformFlag(Transform3D.TRANSFORM_WORLDMATRIX | Transform3D.TRANSFORM_WORLDSCALE, true);
 	            this.event(Laya.Event.TRANSFORM_CHANGED, this._transformFlag);
-	        }
+	        // }
 	        for (var i = 0, n = this._children.length; i < n; i++)
 	            this._children[i]._onWorldPositionScaleTransform();
 	    }

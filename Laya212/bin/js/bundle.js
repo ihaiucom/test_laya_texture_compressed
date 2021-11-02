@@ -187,6 +187,7 @@
             let material = new Laya.UnlitMaterial();
             material.renderMode = Laya.UnlitMaterial.RENDERMODE_TRANSPARENT;
             box.meshRenderer.material = material;
+            this.scene.addChild(box);
             var gl = Laya['LayaGL'].instance;
             var availableExtensions = gl.getSupportedExtensions();
             var str = availableExtensions.join('\n');
@@ -208,7 +209,6 @@
             var sp = new Laya.Sprite();
             sp.name = "ZFSprite";
             window['sp'] = sp;
-            Laya.stage.addChild(sp);
             var txt = new Laya.TextArea();
             txt.name = "ZFTextArea";
             txt.text = str;
@@ -219,15 +219,9 @@
             txt.color = "#ff0000";
             Laya.stage.addChild(txt);
             GameLayaURL.InitCustomFormat();
-            Laya.loader.create("res3d/Conventional/Quad.lh", Laya.Handler.create(null, (sprite3D) => {
-                window['sprite3D'] = sprite3D;
-                sprite3D.transform.localRotationEulerY = 180;
-                // this.scene.RotationTarget(sprite3D);
-                this.scene.addChild(sprite3D);
+            Laya.loader.load("http://192.168.15.39:8901/bin/6.png", Laya.Handler.create(null, (tex) => {
+                material.albedoTexture = tex;
             }));
-
-            
-		    // sp.loadImage("http://192.168.15.39:8901/bin/6.png");
             window['renderNum'] = 0;
         }
         onVersionLoaded() {

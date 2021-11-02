@@ -29,11 +29,6 @@ class Main {
 		// if (GameConfig.stat) Laya.Stat.show();
 		Laya.alertGlobalError(true);
 		
-		// var sp = new Laya.Sprite();
-		// sp.width = Laya.stage.width;
-		// sp.height = Laya.stage.height;
-		// sp.graphics.drawRect(0, 0, sp.width, sp.height, "#FFFFFF");
-		// Laya.stage.addChild(sp);
 
         this.scene = TestScene.create();
         Laya.stage.addChild(this.scene);
@@ -42,13 +37,8 @@ class Main {
 		let material = new Laya.UnlitMaterial();
 		material.renderMode = Laya.UnlitMaterial.RENDERMODE_TRANSPARENT
 		box.meshRenderer.material = material;
-		// this.scene.addChild(box);
+		this.scene.addChild(box);
 		
-		// var sprite = new Laya.Sprite();
-		// // sprite.loadImage("res/layabox.png");
-		// // sprite.loadImage("1_8x8.astc");
-		// sprite.loadImage("1.ktx");
-		// Laya.stage.addChild(sprite);
 
 		
 
@@ -80,7 +70,7 @@ class Main {
 		var sp = new Laya.Sprite();
 		sp.name = "ZFSprite";
 		window['sp'] = sp;
-		Laya.stage.addChild(sp);
+		// Laya.stage.addChild(sp);
 
 		var txt = new Laya.TextArea();
 		txt.name = "ZFTextArea";
@@ -103,20 +93,20 @@ class Main {
 
 		
 		// this.scene.RotationTarget(box);
-		// Laya.loader.load("http://192.168.15.39:8901/bin/6.png", Laya.Handler.create(null,  (tex: Laya.Texture2D)=> {
-		// 	material.albedoTexture = tex;
-		// }));
+		Laya.loader.load("http://192.168.15.39:8901/bin/6.png", Laya.Handler.create(null,  (tex: Laya.Texture2D)=> {
+			material.albedoTexture = tex;
+		}));
 
 		
 		// sp.loadImage("http://192.168.15.39:8901/bin/6.png");
 
 
-		Laya.loader.create("res3d/Conventional/Quad.lh", Laya.Handler.create(null, (sprite3D: Laya.Sprite3D)=>{
-			window['sprite3D'] = sprite3D;
-			sprite3D.transform.localRotationEulerY = 180;
-			// this.scene.RotationTarget(sprite3D);
-			this.scene.addChild(sprite3D);
-		}))
+		// Laya.loader.create("res3d/Conventional/Quad.lh", Laya.Handler.create(null, (sprite3D: Laya.Sprite3D)=>{
+		// 	window['sprite3D'] = sprite3D;
+		// 	sprite3D.transform.localRotationEulerY = 180;
+		// 	// this.scene.RotationTarget(sprite3D);
+		// 	this.scene.addChild(sprite3D);
+		// }))
 		window['renderNum'] = 0;
 
 
