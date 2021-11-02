@@ -29960,10 +29960,6 @@
 	    }
 	    static _loadTexture2D(loader) {
 	        var url = loader.url;
-
-			// TODO ZF
-			url = Laya.URL.customFormatExtReplace ? Laya.URL.customFormatExtReplace(url) : url;
-
 	        var index = url.lastIndexOf('.') + 1;
 	        var verIndex = url.indexOf('?');
 	        var endIndex = verIndex == -1 ? url.length : verIndex;
@@ -29979,9 +29975,6 @@
 	                break;
 	            case "dds":
 	                type = Laya.Loader.BUFFER;
-					// TODO ZF dds图片
-	                (!loader._constructParams) && (loader._constructParams = []);
-	                loader._constructParams[2] = Laya.TextureFormat.DDSTEXTURE;
 	                break;
 	            case "ktx":
 	                type = Laya.Loader.BUFFER;
@@ -29991,14 +29984,8 @@
 	            case "pvr":
 	                type = Laya.Loader.BUFFER;
 	                (!loader._constructParams) && (loader._constructParams = []);
-	                loader._constructParams[2] = Laya.TextureFormat.PVRTEXTURE;
+	                loader._propertyParams[2] = Laya.TextureFormat.PVRTEXTURE;
 	                break;
-				// TODO ZF astc图片
-				case "astc":
-					type = Laya.Loader.BUFFER;
-					(!loader._constructParams) && (loader._constructParams = []);
-					loader._constructParams[2] = Laya.TextureFormat.ASTCTEXTURE;
-					break;
 	        }
 	        loader.on(Laya.Event.LOADED, null, function (image) {
 	            loader._cache = loader._createCache;

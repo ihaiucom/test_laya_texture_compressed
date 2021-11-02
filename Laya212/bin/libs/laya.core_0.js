@@ -1202,9 +1202,6 @@ window.Laya= (function (exports) {
         static formatURL(url) {
             if (!url)
                 return "null path";
-            // TODO ZF 替换文件后缀
-            if (URL.customFormatExtReplace != null)
-                url = URL.customFormatExtReplace(url);
             if (url.indexOf(":") > 0)
                 return url;
             if (URL.exportSceneToJson)
@@ -1270,10 +1267,6 @@ window.Laya= (function (exports) {
             url += "?v=" + newUrl;
         return url;
     };
-
-    // TODO ZF 替换文件后缀
-    URL.customFormatExtReplace = null;
-
     URL._adpteTypeList = [[".scene3d", ".json"], [".scene", ".json"], [".taa", ".json"], [".prefab", ".json"]];
 
     class Resource extends EventDispatcher {
@@ -1466,11 +1459,6 @@ window.Laya= (function (exports) {
         TextureFormat[TextureFormat["ASTC12x12SRGB"] = 27] = "ASTC12x12SRGB";
         TextureFormat[TextureFormat["KTXTEXTURE"] = -1] = "KTXTEXTURE";
         TextureFormat[TextureFormat["PVRTEXTURE"] = -2] = "PVRTEXTURE";
-        // TODO ZF astc图片
-        TextureFormat[TextureFormat["ASTCTEXTURE"] = -3] = "ASTCTEXTURE";
-        // TODO ZF dds图片
-        TextureFormat[TextureFormat["DDSTEXTURE"] = -4] = "DDSTEXTURE";
-
     })(exports.TextureFormat || (exports.TextureFormat = {}));
 
     (function (WarpMode) {
@@ -2444,8 +2432,6 @@ window.Laya= (function (exports) {
                 case exports.TextureFormat.ASTC12x12:
                 case exports.TextureFormat.KTXTEXTURE:
                 case exports.TextureFormat.PVRTEXTURE:
-                case exports.TextureFormat.ASTCTEXTURE:  // TODO ZF astc图片
-                case exports.TextureFormat.DDSTEXTURE:  // TODO ZF dds图片
                     texture.setCompressData(data);
                     break;
                 default:
@@ -2579,18 +2565,6 @@ window.Laya= (function (exports) {
             if (!(header[DDS_HEADER_PF_FLAGS] & DDPF_FOURCC))
                 throw "Unsupported format, must contain a FourCC code";
             var compressedFormat = header[DDS_HEADER_PF_FOURCC];
-
-            
-            // TODO ZF 从文件里读取格式
-            switch (compressedFormat) {
-                case FOURCC_DXT1:
-                    this._format = exports.TextureFormat.DXT1;
-                    break;
-                case FOURCC_DXT5:
-                    this._format = exports.TextureFormat.DXT5;
-                    break;
-            }
-            
             switch (this._format) {
                 case exports.TextureFormat.DXT1:
                     if (compressedFormat !== FOURCC_DXT1)
@@ -2604,16 +2578,15 @@ window.Laya= (function (exports) {
                     throw "unknown texture format.";
             }
             var mipLevels = 1;
-            // TODO ZF 因为读取的不对，所以去掉mipmap
-            // if (header[DDS_HEADER_FLAGS] & DDSD_MIPMAPCOUNT) {
-            //     mipLevels = Math.max(1, header[DDS_HEADER_MIPMAPCOUNT]);
-            //     if (!this._mipmap)
-            //         throw "the mipmap is not same with Texture2D.";
-            // }
-            // else {
-            //     if (this._mipmap)
-            //         throw "the mipmap is not same with Texture2D.";
-            // }
+            if (header[DDS_HEADER_FLAGS] & DDSD_MIPMAPCOUNT) {
+                mipLevels = Math.max(1, header[DDS_HEADER_MIPMAPCOUNT]);
+                if (!this._mipmap)
+                    throw "the mipmap is not same with Texture2D.";
+            }
+            else {
+                if (this._mipmap)
+                    throw "the mipmap is not same with Texture2D.";
+            }
             var width = header[DDS_HEADER_WIDTH];
             var height = header[DDS_HEADER_HEIGHT];
             this._width = width;
@@ -2621,70 +2594,6 @@ window.Laya= (function (exports) {
             var dataOffset = header[DDS_HEADER_SIZE] + 4;
             this._upLoadCompressedTexImage2D(arrayBuffer, width, height, mipLevels, dataOffset, 0);
         }
-        
-        
-        // TODO ZF astc贴图解析
-        _pharseASTC(arrayBuffer) {
-
-
-            const ASTC_MAGIC = 0x5CA1AB13;
-            const ASTC_HEADER_MAGIC = 4;
-            const ASTC_HEADER_LENGTH = 16; // The header length
-            
-            const ASTC_HEADER_SIZE_X_BEGIN = 7;
-            const ASTC_HEADER_SIZE_Y_BEGIN = 10;
-            const ASTC_HEADER_SIZE_Z_BEGIN = 13;
-
-            var header = new Uint8Array(arrayBuffer);
-            
-            const magicval = header[0] + (header[1] << 8) + (header[2] << 16) + (header[3] << 24);
-            if (magicval !== ASTC_MAGIC) {
-                throw new Error('Invalid magic number in ASTC header');
-            }
-
-            const xdim = header[ASTC_HEADER_MAGIC];
-            const ydim = header[ASTC_HEADER_MAGIC + 1];
-            const zdim = header[ASTC_HEADER_MAGIC + 2];
-            if ((xdim < 3 || xdim > 6 || ydim < 3 || ydim > 6 || zdim < 3 || zdim > 6)
-                && (xdim < 4 || xdim === 7 || xdim === 9 || xdim === 11 || xdim > 12
-                || ydim < 4 || ydim === 7 || ydim === 9 || ydim === 11 || ydim > 12 || zdim !== 1)) {
-                throw new Error('Invalid block number in ASTC header');
-            }
-            
-            const glFormat = ZF_ASTC.GetFormats(xdim, ydim, zdim);
-            const width = header[ASTC_HEADER_SIZE_X_BEGIN] + (header[ASTC_HEADER_SIZE_X_BEGIN + 1] << 8) + (header[ASTC_HEADER_SIZE_X_BEGIN + 2] << 16);
-            const height = header[ASTC_HEADER_SIZE_Y_BEGIN] + (header[ASTC_HEADER_SIZE_Y_BEGIN + 1] << 8) + (header[ASTC_HEADER_SIZE_Y_BEGIN + 2] << 16);
-            const zsize = header[ASTC_HEADER_SIZE_Z_BEGIN] + (header[ASTC_HEADER_SIZE_Z_BEGIN + 1] << 8) + (header[ASTC_HEADER_SIZE_Z_BEGIN + 2] << 16);
-
-
-            const astcData = new Uint8Array(arrayBuffer, ASTC_HEADER_LENGTH);
-            
-
-            this._width = width;
-            this._height = height;
-            this._upLoadASTCCompressedTexImage2D(astcData, width, height, glFormat);
-        }
-
-        
-        _upLoadASTCCompressedTexImage2D(astcDataUint8Array, width, height, glFormat) {
-            var gl = LayaGL.instance;
-            var textureType = this._glTextureType;
-            WebGLContext.bindTexture(gl, textureType, this._glTexture);
-            var offset = astcDataUint8Array.length;
-        
-            console.log(` gl.compressedTexImage2D width=${width}, height=${height}, miplevel=0, glFormat=${glFormat}, textureType=${textureType}`);
-         
-          
-            gl.compressedTexImage2D(textureType, 0, glFormat, width, height, 0, astcDataUint8Array);
-        
-            var memory = offset;
-            this._setGPUMemory(memory);
-            this._readyed = true;
-            this._activeResource();
-        }
-
-        
-
         _pharseKTX(arrayBuffer) {
             const ETC_HEADER_LENGTH = 13;
             const ETC_HEADER_FORMAT = 4;
@@ -2797,13 +2706,8 @@ window.Laya= (function (exports) {
                     this._format = exports.TextureFormat.PVRTCRGBA_4BPPV;
                     break;
                 default:
-                    // TODO ZF 将异常弹对话框
-                    // alert("Texture2D:unknown PVR format. compressedFormat="+compressedFormat)
                     throw "Texture2D:unknown PVR format.";
-                    this._format = exports.TextureFormat.PVRTCRGBA_2BPPV;
-                    break;
             }
-            
             var mipLevels = header[PVR_HEADER_MIPMAPCOUNT];
             var width = header[PVR_HEADER_WIDTH];
             var height = header[PVR_HEADER_HEIGHT];
@@ -2950,10 +2854,13 @@ window.Laya= (function (exports) {
             switch (this._format) {
                 case exports.TextureFormat.DXT1:
                 case exports.TextureFormat.DXT5:
-                case exports.TextureFormat.DDSTEXTURE: // TODO ZF dds图片
                     this._pharseDDS(data);
                     break;
-                  // TODO ZF  将astc独立出来解析
+                case exports.TextureFormat.ETC1RGB:
+                case exports.TextureFormat.ETC2RGB:
+                case exports.TextureFormat.ETC2RGBA:
+                case exports.TextureFormat.ETC2RGB_Alpha8:
+                case exports.TextureFormat.ETC2SRGB:
                 case exports.TextureFormat.ASTC4x4:
                 case exports.TextureFormat.ASTC4x4SRGB:
                 case exports.TextureFormat.ASTC6x6:
@@ -2964,15 +2871,6 @@ window.Laya= (function (exports) {
                 case exports.TextureFormat.ASTC10x10SRGB:
                 case exports.TextureFormat.ASTC12x12:
                 case exports.TextureFormat.ASTC12x12SRGB:
-                case exports.TextureFormat.ASTCTEXTURE: // TODO ZF astc图片
-                    this._pharseASTC(data);
-                    break;
-
-                case exports.TextureFormat.ETC1RGB:
-                case exports.TextureFormat.ETC2RGB:
-                case exports.TextureFormat.ETC2RGBA:
-                case exports.TextureFormat.ETC2RGB_Alpha8:
-                case exports.TextureFormat.ETC2SRGB:
                 case exports.TextureFormat.KTXTEXTURE:
                     this._pharseKTX(data);
                     break;
@@ -6182,7 +6080,7 @@ window.Laya= (function (exports) {
 
     var texture_vs = "/*\n\ttexture和fillrect使用的。\n*/\nattribute vec4 posuv;\nattribute vec4 attribColor;\nattribute vec4 attribFlags;\n//attribute vec4 clipDir;\n//attribute vec2 clipRect;\nuniform vec4 clipMatDir;\nuniform vec2 clipMatPos;\t\t// 这个是全局的，不用再应用矩阵了。\nvarying vec2 cliped;\nuniform vec2 size;\nuniform vec2 clipOff;\t\t\t// 使用要把clip偏移。cacheas normal用. 只用了[0]\n#ifdef WORLDMAT\n\tuniform mat4 mmat;\n#endif\n#ifdef MVP3D\n\tuniform mat4 u_MvpMatrix;\n#endif\nvarying vec4 v_texcoordAlpha;\nvarying vec4 v_color;\nvarying float v_useTex;\n\nvoid main() {\n\n\tvec4 pos = vec4(posuv.xy,0.,1.);\n#ifdef WORLDMAT\n\tpos=mmat*pos;\n#endif\n\tvec4 pos1  =vec4((pos.x/size.x-0.5)*2.0,(0.5-pos.y/size.y)*2.0,0.,1.0);\n#ifdef MVP3D\n\tgl_Position=u_MvpMatrix*pos1;\n#else\n\tgl_Position=pos1;\n#endif\n\tv_texcoordAlpha.xy = posuv.zw;\n\t//v_texcoordAlpha.z = attribColor.a/255.0;\n\tv_color = attribColor/255.0;\n\tv_color.xyz*=v_color.w;//反正后面也要预乘\n\t\n\tv_useTex = attribFlags.r/255.0;\n\tfloat clipw = length(clipMatDir.xy);\n\tfloat cliph = length(clipMatDir.zw);\n\t\n\tvec2 clpos = clipMatPos.xy;\n\t#ifdef WORLDMAT\n\t\t// 如果有mmat，需要修改clipMatPos,因为 这是cacheas normal （如果不是就错了）， clipMatPos被去掉了偏移\n\t\tif(clipOff[0]>0.0){\n\t\t\tclpos.x+=mmat[3].x;\t//tx\t最简单处理\n\t\t\tclpos.y+=mmat[3].y;\t//ty\n\t\t}\n\t#endif\n\tvec2 clippos = pos.xy - clpos;\t//pos已经应用矩阵了，为了减的有意义，clip的位置也要缩放\n\tif(clipw>20000. && cliph>20000.)\n\t\tcliped = vec2(0.5,0.5);\n\telse {\n\t\t//转成0到1之间。/clipw/clipw 表示clippos与normalize之后的clip朝向点积之后，再除以clipw\n\t\tcliped=vec2( dot(clippos,clipMatDir.xy)/clipw/clipw, dot(clippos,clipMatDir.zw)/cliph/cliph);\n\t}\n\n}";
 
-    var texture_ps = "/*\r\n\ttexture和fillrect使用的。\r\n*/\r\n#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\nprecision highp float;\r\n#else\r\nprecision mediump float;\r\n#endif\r\n\r\nvarying vec4 v_texcoordAlpha;\r\nvarying vec4 v_color;\r\nvarying float v_useTex;\r\nuniform sampler2D texture;\r\nvarying vec2 cliped;\r\n\r\n#ifdef BLUR_FILTER\r\nuniform vec4 strength_sig2_2sig2_gauss1;\r\nuniform vec2 blurInfo;\r\n\r\n#define PI 3.141593\r\n\r\nfloat getGaussian(float x, float y){\r\n    return strength_sig2_2sig2_gauss1.w*exp(-(x*x+y*y)/strength_sig2_2sig2_gauss1.z);\r\n}\r\n\r\nvec4 blur(){\r\n    const float blurw = 9.0;\r\n    vec4 vec4Color = vec4(0.0,0.0,0.0,0.0);\r\n    vec2 halfsz=vec2(blurw,blurw)/2.0/blurInfo;    \r\n    vec2 startpos=v_texcoordAlpha.xy-halfsz;\r\n    vec2 ctexcoord = startpos;\r\n    vec2 step = 1.0/blurInfo;  //每个像素      \r\n    \r\n    for(float y = 0.0;y<=blurw; ++y){\r\n        ctexcoord.x=startpos.x;\r\n        for(float x = 0.0;x<=blurw; ++x){\r\n            //TODO 纹理坐标的固定偏移应该在vs中处理\r\n            vec4Color += texture2D(texture, ctexcoord)*getGaussian(x-blurw/2.0,y-blurw/2.0);\r\n            ctexcoord.x+=step.x;\r\n        }\r\n        ctexcoord.y+=step.y;\r\n    }\r\n    return vec4Color;\r\n}\r\n#endif\r\n\r\n#ifdef COLOR_FILTER\r\nuniform vec4 colorAlpha;\r\nuniform mat4 colorMat;\r\n#endif\r\n\r\n#ifdef GLOW_FILTER\r\nuniform vec4 u_color;\r\nuniform vec4 u_blurInfo1;\r\nuniform vec4 u_blurInfo2;\r\n#endif\r\n\r\n#ifdef COLOR_ADD\r\nuniform vec4 colorAdd;\r\n#endif\r\n\r\n#ifdef FILLTEXTURE\t\r\nuniform vec4 u_TexRange;//startu,startv,urange, vrange\r\n#endif\r\nvoid main() {\r\n\tif(cliped.x<0.) discard;\r\n\tif(cliped.x>1.) discard;\r\n\tif(cliped.y<0.) discard;\r\n\tif(cliped.y>1.) discard;\r\n\t\r\n#ifdef FILLTEXTURE\t\r\n   vec4 color= texture2D(texture, fract(v_texcoordAlpha.xy)*u_TexRange.zw + u_TexRange.xy);\r\n#else\r\n   vec4 color= texture2D(texture, v_texcoordAlpha.xy);\r\n#endif\r\n        color.rgb*=color.a;        \r\n   if(v_useTex<=0.)color = vec4(1.,1.,1.,1.);\r\n   color.a*=v_color.w;\r\n   //color.rgb*=v_color.w;\r\n   color.rgb*=v_color.rgb;\r\n   gl_FragColor=color;\r\n   \r\n   #ifdef COLOR_ADD\r\n\tgl_FragColor = vec4(colorAdd.rgb,colorAdd.a*gl_FragColor.a);\r\n\tgl_FragColor.xyz *= colorAdd.a;\r\n   #endif\r\n   \r\n   #ifdef BLUR_FILTER\r\n\tgl_FragColor =   blur();\r\n\tgl_FragColor.w*=v_color.w;   \r\n   #endif\r\n   \r\n   #ifdef COLOR_FILTER\r\n\tmat4 alphaMat =colorMat;\r\n\r\n\talphaMat[0][3] *= gl_FragColor.a;\r\n\talphaMat[1][3] *= gl_FragColor.a;\r\n\talphaMat[2][3] *= gl_FragColor.a;\r\n\r\n\tgl_FragColor = gl_FragColor * alphaMat;\r\n\tgl_FragColor += colorAlpha/255.0*gl_FragColor.a;\r\n   #endif\r\n   \r\n   #ifdef GLOW_FILTER\r\n\tconst float c_IterationTime = 10.0;\r\n\tfloat floatIterationTotalTime = c_IterationTime * c_IterationTime;\r\n\tvec4 vec4Color = vec4(0.0,0.0,0.0,0.0);\r\n\tvec2 vec2FilterDir = vec2(-(u_blurInfo1.z)/u_blurInfo2.x,-(u_blurInfo1.w)/u_blurInfo2.y);\r\n\tvec2 vec2FilterOff = vec2(u_blurInfo1.x/u_blurInfo2.x/c_IterationTime * 2.0,u_blurInfo1.y/u_blurInfo2.y/c_IterationTime * 2.0);\r\n\tfloat maxNum = u_blurInfo1.x * u_blurInfo1.y;\r\n\tvec2 vec2Off = vec2(0.0,0.0);\r\n\tfloat floatOff = c_IterationTime/2.0;\r\n\tfor(float i = 0.0;i<=c_IterationTime; ++i){\r\n\t\tfor(float j = 0.0;j<=c_IterationTime; ++j){\r\n\t\t\tvec2Off = vec2(vec2FilterOff.x * (i - floatOff),vec2FilterOff.y * (j - floatOff));\r\n\t\t\tvec4Color += texture2D(texture, v_texcoordAlpha.xy + vec2FilterDir + vec2Off)/floatIterationTotalTime;\r\n\t\t}\r\n\t}\r\n\tgl_FragColor = vec4(u_color.rgb,vec4Color.a * u_blurInfo2.z);\r\n\tgl_FragColor.rgb *= gl_FragColor.a;   \r\n   #endif\r\n   \r\n}";
+    var texture_ps = "/*\r\n\ttexture和fillrect使用的。\r\n*/\r\n#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\nprecision highp float;\r\n#else\r\nprecision mediump float;\r\n#endif\r\n\r\nvarying vec4 v_texcoordAlpha;\r\nvarying vec4 v_color;\r\nvarying float v_useTex;\r\nuniform sampler2D texture;\r\nvarying vec2 cliped;\r\n\r\n#ifdef BLUR_FILTER\r\nuniform vec4 strength_sig2_2sig2_gauss1;\r\nuniform vec2 blurInfo;\r\n\r\n#define PI 3.141593\r\n\r\nfloat getGaussian(float x, float y){\r\n    return strength_sig2_2sig2_gauss1.w*exp(-(x*x+y*y)/strength_sig2_2sig2_gauss1.z);\r\n}\r\n\r\nvec4 blur(){\r\n    const float blurw = 9.0;\r\n    vec4 vec4Color = vec4(0.0,0.0,0.0,0.0);\r\n    vec2 halfsz=vec2(blurw,blurw)/2.0/blurInfo;    \r\n    vec2 startpos=v_texcoordAlpha.xy-halfsz;\r\n    vec2 ctexcoord = startpos;\r\n    vec2 step = 1.0/blurInfo;  //每个像素      \r\n    \r\n    for(float y = 0.0;y<=blurw; ++y){\r\n        ctexcoord.x=startpos.x;\r\n        for(float x = 0.0;x<=blurw; ++x){\r\n            //TODO 纹理坐标的固定偏移应该在vs中处理\r\n            vec4Color += texture2D(texture, ctexcoord)*getGaussian(x-blurw/2.0,y-blurw/2.0);\r\n            ctexcoord.x+=step.x;\r\n        }\r\n        ctexcoord.y+=step.y;\r\n    }\r\n    return vec4Color;\r\n}\r\n#endif\r\n\r\n#ifdef COLOR_FILTER\r\nuniform vec4 colorAlpha;\r\nuniform mat4 colorMat;\r\n#endif\r\n\r\n#ifdef GLOW_FILTER\r\nuniform vec4 u_color;\r\nuniform vec4 u_blurInfo1;\r\nuniform vec4 u_blurInfo2;\r\n#endif\r\n\r\n#ifdef COLOR_ADD\r\nuniform vec4 colorAdd;\r\n#endif\r\n\r\n#ifdef FILLTEXTURE\t\r\nuniform vec4 u_TexRange;//startu,startv,urange, vrange\r\n#endif\r\nvoid main() {\r\n\tif(cliped.x<0.) discard;\r\n\tif(cliped.x>1.) discard;\r\n\tif(cliped.y<0.) discard;\r\n\tif(cliped.y>1.) discard;\r\n\t\r\n#ifdef FILLTEXTURE\t\r\n   vec4 color= texture2D(texture, fract(v_texcoordAlpha.xy)*u_TexRange.zw + u_TexRange.xy);\r\n#else\r\n   vec4 color= texture2D(texture, v_texcoordAlpha.xy);\r\n#endif\r\n\r\n   if(v_useTex<=0.)color = vec4(1.,1.,1.,1.);\r\n   color.a*=v_color.w;\r\n   //color.rgb*=v_color.w;\r\n   color.rgb*=v_color.rgb;\r\n   gl_FragColor=color;\r\n   \r\n   #ifdef COLOR_ADD\r\n\tgl_FragColor = vec4(colorAdd.rgb,colorAdd.a*gl_FragColor.a);\r\n\tgl_FragColor.xyz *= colorAdd.a;\r\n   #endif\r\n   \r\n   #ifdef BLUR_FILTER\r\n\tgl_FragColor =   blur();\r\n\tgl_FragColor.w*=v_color.w;   \r\n   #endif\r\n   \r\n   #ifdef COLOR_FILTER\r\n\tmat4 alphaMat =colorMat;\r\n\r\n\talphaMat[0][3] *= gl_FragColor.a;\r\n\talphaMat[1][3] *= gl_FragColor.a;\r\n\talphaMat[2][3] *= gl_FragColor.a;\r\n\r\n\tgl_FragColor = gl_FragColor * alphaMat;\r\n\tgl_FragColor += colorAlpha/255.0*gl_FragColor.a;\r\n   #endif\r\n   \r\n   #ifdef GLOW_FILTER\r\n\tconst float c_IterationTime = 10.0;\r\n\tfloat floatIterationTotalTime = c_IterationTime * c_IterationTime;\r\n\tvec4 vec4Color = vec4(0.0,0.0,0.0,0.0);\r\n\tvec2 vec2FilterDir = vec2(-(u_blurInfo1.z)/u_blurInfo2.x,-(u_blurInfo1.w)/u_blurInfo2.y);\r\n\tvec2 vec2FilterOff = vec2(u_blurInfo1.x/u_blurInfo2.x/c_IterationTime * 2.0,u_blurInfo1.y/u_blurInfo2.y/c_IterationTime * 2.0);\r\n\tfloat maxNum = u_blurInfo1.x * u_blurInfo1.y;\r\n\tvec2 vec2Off = vec2(0.0,0.0);\r\n\tfloat floatOff = c_IterationTime/2.0;\r\n\tfor(float i = 0.0;i<=c_IterationTime; ++i){\r\n\t\tfor(float j = 0.0;j<=c_IterationTime; ++j){\r\n\t\t\tvec2Off = vec2(vec2FilterOff.x * (i - floatOff),vec2FilterOff.y * (j - floatOff));\r\n\t\t\tvec4Color += texture2D(texture, v_texcoordAlpha.xy + vec2FilterDir + vec2Off)/floatIterationTotalTime;\r\n\t\t}\r\n\t}\r\n\tgl_FragColor = vec4(u_color.rgb,vec4Color.a * u_blurInfo2.z);\r\n\tgl_FragColor.rgb *= gl_FragColor.a;   \r\n   #endif\r\n   \r\n}";
 
     var prime_vs = "attribute vec4 position;\nattribute vec4 attribColor;\n//attribute vec4 clipDir;\n//attribute vec2 clipRect;\nuniform vec4 clipMatDir;\nuniform vec2 clipMatPos;\n#ifdef WORLDMAT\n\tuniform mat4 mmat;\n#endif\nuniform mat4 u_mmat2;\n//uniform vec2 u_pos;\nuniform vec2 size;\nvarying vec4 color;\n//vec4 dirxy=vec4(0.9,0.1, -0.1,0.9);\n//vec4 clip=vec4(100.,30.,300.,600.);\nvarying vec2 cliped;\nvoid main(){\n\t\n#ifdef WORLDMAT\n\tvec4 pos=mmat*vec4(position.xy,0.,1.);\n\tgl_Position =vec4((pos.x/size.x-0.5)*2.0,(0.5-pos.y/size.y)*2.0,pos.z,1.0);\n#else\n\tgl_Position =vec4((position.x/size.x-0.5)*2.0,(0.5-position.y/size.y)*2.0,position.z,1.0);\n#endif\t\n\tfloat clipw = length(clipMatDir.xy);\n\tfloat cliph = length(clipMatDir.zw);\n\tvec2 clippos = position.xy - clipMatPos.xy;\t//pos已经应用矩阵了，为了减的有意义，clip的位置也要缩放\n\tif(clipw>20000. && cliph>20000.)\n\t\tcliped = vec2(0.5,0.5);\n\telse {\n\t\t//clipdir是带缩放的方向，由于上面clippos是在缩放后的空间计算的，所以需要把方向先normalize一下\n\t\tcliped=vec2( dot(clippos,clipMatDir.xy)/clipw/clipw, dot(clippos,clipMatDir.zw)/cliph/cliph);\n\t}\n  //pos2d.x = dot(clippos,dirx);\n  color=attribColor/255.;\n}";
 
@@ -6191,8 +6089,6 @@ window.Laya= (function (exports) {
     var skin_vs = "attribute vec2 position;\nattribute vec2 texcoord;\nattribute vec4 color;\nuniform vec2 size;\nuniform float offsetX;\nuniform float offsetY;\nuniform mat4 mmat;\nuniform mat4 u_mmat2;\nvarying vec2 v_texcoord;\nvarying vec4 v_color;\nvoid main() {\n  vec4 pos=mmat*u_mmat2*vec4(offsetX+position.x,offsetY+position.y,0,1 );\n  gl_Position = vec4((pos.x/size.x-0.5)*2.0,(0.5-pos.y/size.y)*2.0,pos.z,1.0);\n  v_color = color;\n  v_color.rgb *= v_color.a;\n  v_texcoord = texcoord;  \n}";
 
     var skin_ps = "precision mediump float;\nvarying vec2 v_texcoord;\nvarying vec4 v_color;\nuniform sampler2D texture;\nuniform float alpha;\nvoid main() {\n\tvec4 t_color = texture2D(texture, v_texcoord);\n\tgl_FragColor = t_color.rgba * v_color;\n\tgl_FragColor *= alpha;\n}";
-
-
 
     class Shader2D {
         constructor() {
@@ -6207,8 +6103,6 @@ window.Laya= (function (exports) {
             this.filters = null;
         }
         static __init__() {
-            // TODO ZF
-            // Shader.preCompile2D(0, ShaderDefines2D.TEXTURE2D, texture_vs, zf_texture_ps, null);
             Shader.preCompile2D(0, ShaderDefines2D.TEXTURE2D, texture_vs, texture_ps, null);
             Shader.preCompile2D(0, ShaderDefines2D.PRIMITIVE, prime_vs, prime_ps, null);
             Shader.preCompile2D(0, ShaderDefines2D.SKINMESH, skin_vs, skin_ps, null);
@@ -7781,28 +7675,8 @@ window.Laya= (function (exports) {
             this.uv = uv || Texture.DEF_UV;
         }
         load(url, complete = null) {
-            // TODO ZF 之前, 2d Texture load
-            // if (!this._destroyed)
-            //     ILaya.loader.load(url, Handler.create(this, this._onLoaded, [complete]), null, "htmlimage", 1, true);
-
-            // TODO ZF 之后, 2d Texture load
             if (!this._destroyed)
-            {
-                var newUrl = URL.customFormatExtReplace ? URL.customFormatExtReplace(url) : url;
-			    var ext = Utils.getFileExtension(newUrl);
-                var type = "htmlimage";
-                switch(ext)
-                {
-                    case "ktx":
-                    case "pvr":
-                    case "dds":
-                    case "astc":
-                        type = Loader.IMAGE;
-                        break;
-                }
-
-                ILaya.loader.load(url, Handler.create(this, this._onLoaded, [complete]), null, type, 1, true);
-            }
+                ILaya.loader.load(url, Handler.create(this, this._onLoaded, [complete]), null, "htmlimage", 1, true);
         }
         getTexturePixels(x, y, width, height) {
             var st, dst, i;
@@ -14986,14 +14860,6 @@ window.Laya= (function (exports) {
             return this;
         }
         render(ctx, x, y) {
-            // if(this.name == "ZFSprite" || this.name == "stage")
-            // {
-            //     // if(this.name == "ZFSprite")
-            //     // {
-            //     //     console.log("【Sprite render】" + this.name, this.constructor.name, this._renderType, RenderSprite.renders[this._renderType]._fun, RenderSprite.renders[this._renderType]);
-                
-            //     // }
-            // }
             RenderSprite.renders[this._renderType]._fun(this, ctx, x + this._x, y + this._y);
             this._repaint = 0;
         }
@@ -19343,10 +19209,7 @@ window.Laya= (function (exports) {
                 if (ext == 'bin' && this._url) {
                     ext = Utils.getFileExtension(this._url);
                 }
-                // TODO ZF 之前
-                // if (ext === "ktx" || ext === "pvr")
-                // TODO ZF 之后, 添加dds、astc
-                if (ext === "ktx" || ext === "pvr" || ext === "dds" || ext === "astc")
+                if (ext === "ktx" || ext === "pvr")
                     this._loadHttpRequest(url, Loader.BUFFER, this, this.onLoaded, this, this.onProgress, this, this.onError);
                 else
                     this._loadHtmlImage(url, this, this.onLoaded, this, onError);
@@ -19395,9 +19258,7 @@ window.Laya= (function (exports) {
             else if (type === Loader.IMAGE) {
                 let tex;
                 if (data instanceof ArrayBuffer) {
-                    // TODO ZF 替换后缀
-                    var url = URL.customFormatExtReplace ? URL.customFormatExtReplace(this._url) : this._url;
-                    var ext = Utils.getFileExtension(url);
+                    var ext = Utils.getFileExtension(this._url);
                     let format;
                     switch (ext) {
                         case "ktx":
@@ -19405,13 +19266,6 @@ window.Laya= (function (exports) {
                             break;
                         case "pvr":
                             format = exports.TextureFormat.PVRTCRGBA_4BPPV;
-                            break;
-                        // TODO ZF 添加 dds,astc
-                        case "dds":
-                            format = exports.TextureFormat.DXT5;
-                            break;
-                        case "astc":
-                            format = exports.TextureFormat.ASTC4x4;
                             break;
                         default: {
                             console.error('unknown format', ext);
@@ -19800,8 +19654,7 @@ window.Laya= (function (exports) {
     Loader.AVATAR = "AVATAR";
     Loader.TERRAINHEIGHTDATA = "TERRAINHEIGHTDATA";
     Loader.TERRAINRES = "TERRAIN";
-    // TODO ZF 添加 "dds": "image","astc": "image",
-    Loader.typeMap = { "dds": "image","astc": "image","ttf": "ttf", "png": "image", "jpg": "image", "jpeg": "image", "ktx": "image", "pvr": "image", "txt": "text", "json": "json", "prefab": "prefab", "xml": "xml", "als": "atlas", "atlas": "atlas", "mp3": "sound", "ogg": "sound", "wav": "sound", "part": "json", "fnt": "font", "plf": "plf", "plfb": "plfb", "scene": "json", "ani": "json", "sk": "arraybuffer", "wasm": "arraybuffer" };
+    Loader.typeMap = { "ttf": "ttf", "png": "image", "jpg": "image", "jpeg": "image", "ktx": "image", "pvr": "image", "txt": "text", "json": "json", "prefab": "prefab", "xml": "xml", "als": "atlas", "atlas": "atlas", "mp3": "sound", "ogg": "sound", "wav": "sound", "part": "json", "fnt": "font", "plf": "plf", "plfb": "plfb", "scene": "json", "ani": "json", "sk": "arraybuffer", "wasm": "arraybuffer" };
     Loader.parserMap = {};
     Loader.maxTimeOut = 100;
     Loader.groupMap = {};
@@ -26512,68 +26365,6 @@ window.Laya= (function (exports) {
             }
         }
     }
-
-    
-    // TODO ZF 读取astc format
-    class ZF_ASTC
-    {
-        static GetFormats(blockX, blockY, blockZ = 1, isAlpha = false)
-        {
-            this.InitFormats();
-            for(let item of this.FORMATS )
-            {
-                if(item[0] == blockX && item[1] == blockY && item[2] == blockZ && item[3] == isAlpha)
-                {
-                    return item[4];
-                }
-            }
-            return LayaGL.layaGPUInstance._compressedTextureASTC.COMPRESSED_RGBA_ASTC_12x12_KHR;
-        }
-
-        static InitFormats()
-        {
-            if(this.FORMATS == null)
-            {
-                var GLTC = LayaGL.layaGPUInstance._compressedTextureASTC;
-                this.FORMATS =[
-                    // 2D Linear RGB
-                    [ 4,  4,  1, false, GLTC.COMPRESSED_RGBA_ASTC_4x4_KHR],
-                    [ 5,  4,  1, false, GLTC.COMPRESSED_RGBA_ASTC_5x4_KHR],
-                    [ 5,  5,  1, false, GLTC.COMPRESSED_RGBA_ASTC_5x5_KHR],
-                    [ 6,  5,  1, false, GLTC.COMPRESSED_RGBA_ASTC_6x5_KHR],
-                    [ 6,  6,  1, false, GLTC.COMPRESSED_RGBA_ASTC_6x6_KHR],
-                    [ 8,  5,  1, false, GLTC.COMPRESSED_RGBA_ASTC_8x5_KHR],
-                    [ 8,  6,  1, false, GLTC.COMPRESSED_RGBA_ASTC_8x6_KHR],
-                    [ 8,  8,  1, false, GLTC.COMPRESSED_RGBA_ASTC_8x8_KHR],
-                    [10,  5,  1, false, GLTC.COMPRESSED_RGBA_ASTC_10x5_KHR],
-                    [10,  6,  1, false, GLTC.COMPRESSED_RGBA_ASTC_10x6_KHR],
-                    [10,  8,  1, false, GLTC.COMPRESSED_RGBA_ASTC_10x8_KHR],
-                    [10, 10,  1, false, GLTC.COMPRESSED_RGBA_ASTC_10x10_KHR],
-                    [12, 10,  1, false, GLTC.COMPRESSED_RGBA_ASTC_12x10_KHR],
-                    [12, 12,  1, false, GLTC.COMPRESSED_RGBA_ASTC_12x12_KHR],
-                    // 2D SRGB
-                    [ 4,  4,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR],
-                    [ 5,  4,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR],
-                    [ 5,  5,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR],
-                    [ 6,  5,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR],
-                    [ 6,  6,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR],
-                    [ 8,  5,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR],
-                    [ 8,  6,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR],
-                    [ 8,  8,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR],
-                    [10,  5,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR],
-                    [10,  6,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR],
-                    [10,  8,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR],
-                    [10, 10,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR],
-                    [12, 10,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR],
-                    [12, 12,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR]
-                ]
-
-            }
-        }
-    }
-    ZF_ASTC.FORMATS= null;
-
-    exports.ZF_ASTC = ZF_ASTC;
 
     exports.AlphaCmd = AlphaCmd;
     exports.Animation = Animation;
