@@ -79,8 +79,8 @@
             if (GameLayaURL.__src_customFormatExtReplace) {
                 newUrl = GameLayaURL.__src_customFormatExtReplace(newUrl);
             }
-            console.log("【customFormat】url:", url);
-            console.log("【customFormat】newUrl:", newUrl);
+            // console.log("【customFormat】url:", url);
+            // console.log("【customFormat】newUrl:", newUrl);
             return newUrl;
         }
     }

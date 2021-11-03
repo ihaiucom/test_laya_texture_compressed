@@ -13,3 +13,13 @@ loadLib("libs/laya.ui.js");
 loadLib("libs/laya.d3.js")
 //-----libs-end-------
 loadLib("js/bundle.js");
+
+console.warn(
+  Laya.Browser.onMobile,
+  Laya.Browser.onIOS,
+  Laya.Browser.onAndroid,
+  Laya.Browser.onPC,
+  Laya.Browser.onMac);
+
+console.warn("memory", window.performance);
+console.warn("location", location);

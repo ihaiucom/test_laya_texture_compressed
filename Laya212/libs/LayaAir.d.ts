@@ -187,6 +187,8 @@
 	 */
 	declare class Laya  {
 
+		static MiniFileManager: any; // TODO ZF 微信小游戏文件管理
+
 		/**
 		 * 舞台对象的引用。
 		 */
@@ -30487,6 +30489,8 @@ enum HTMLElementType {
 		 * 自定义URL格式化的方式。例如： customFormat = function(url:String):String{}
 		 */
 		static customFormat:Function;
+
+		// TODO ZF 文件后缀替换
 		/**
 		 * 自定义URL格式化的方式， 替换后缀(比如：.png->.astc)。例如： customFormatExtReplace = function(url:String):String{}
 		 */
