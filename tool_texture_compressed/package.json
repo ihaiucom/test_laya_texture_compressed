@@ -1,0 +1,21 @@
+{
+  "name": "astc-encoder",
+  "version": "1.0.0",
+  "description": ">ES3.0出现后在2012年中产生的一种业界领先的纹理压缩格式，它的压缩分块从4x4到12x12最终可以压缩到每个像素占用1bit以下，压缩比例有多种可选。ASTC格式支持RGBA，且适用于2的幂次方长宽等比尺寸和无尺寸要求的NPOT（非2的幂次方）纹理。   \r  以ASTC 4x4 block压缩格式为例，每个像素占用1字节，8bits。一张1024*1024大小的贴图压缩后的大小为1M。  \r ASTC在压缩质量和容量上有很大的优势。  \r 文档中有详细的测试数据：",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^16.11.6",
+    "image-size": "^1.0.0",
+    "xlsx": "^0.17.3"
+  }
+}

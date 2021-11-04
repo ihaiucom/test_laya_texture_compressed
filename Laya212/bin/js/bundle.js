@@ -266,7 +266,12 @@
                     level = EnumGameAssetLevel.high;
                     break;
                 case EnumGamePaltformApp.Brower:
-                    level = EnumGameAssetLevel.high;
+                    if (Laya.Browser.onMobile) {
+                        level = EnumGameAssetLevel.low;
+                    }
+                    else {
+                        level = EnumGameAssetLevel.high;
+                    }
                     break;
             }
             folder = `${ext}_${level}`;
@@ -394,14 +399,9 @@
             txt.color = "#ff0000";
             Laya.stage.addChild(txt);
             GameLayaExtend.Init();
-            // GameLayaExtend.AssetFolder = EnumGameAssetFolder.dds_high;
-            // GameLayaExtend.AssetFolder = EnumGameAssetFolder.dds_middle;
-            // GameLayaExtend.AssetFolder = EnumGameAssetFolder.dds_low;
-
-            // GameLayaExtend.AssetFolder = EnumGameAssetFolder.default_high;
-            // GameLayaExtend.AssetFolder = EnumGameAssetFolder.default_middle;
-            // GameLayaExtend.AssetFolder = EnumGameAssetFolder.default_low;
-            GameLayaURL.SetBasePath("../asset_platform", GameLayaExtend.AssetFolder);
+            if (!window['wx'])
+                alert(GameLayaExtend.AssetFolder);
+            GameLayaURL.SetBasePath("http://192.168.15.39:8901/asset_platform", GameLayaExtend.AssetFolder);
             GameLayaURL.LoadExtReplaceConfig(Laya.Handler.create(null, () => {
                 GameLayaURL.InitCustomFormat();
                 Laya.loader.load("6.png", Laya.Handler.create(null, (tex) => {

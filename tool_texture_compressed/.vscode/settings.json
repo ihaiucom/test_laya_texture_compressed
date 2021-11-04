@@ -1,0 +1,27 @@
+{
+    "debug.javascript.usePreview": false,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "typescript.suggest.autoImports": true,
+    "search.exclude": {
+        ".idea/": true,
+    },
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        ".laya/_pub_old/": true,
+        ".idea/": true,
+    },
+    "editor.formatOnSave": true,
+    "typescript.format.placeOpenBraceOnNewLineForFunctions": true,
+    "typescript.format.placeOpenBraceOnNewLineForControlBlocks": true,
+    "typescript.format.insertSpaceAfterTypeAssertion": true,
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+    "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+    "typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+    "typescript.format.insertSpaceAfterSemicolonInForStatements": false,
+    "typescript.format.insertSpaceAfterCommaDelimiter": false,
+    "tslint.exclude": "build",
+    "typescript.updateImportsOnFileMove.enabled": "always"
+}

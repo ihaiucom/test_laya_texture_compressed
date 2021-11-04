@@ -91,10 +91,17 @@ class Main {
 		// Laya.ResourceVersion.enable("version.json", Laya.Handler.create(this, this.onVersionLoaded), Laya.ResourceVersion.FILENAME_VERSION);
 
 		GameLayaExtend.Init();
-		GameLayaExtend.AssetFolder = EnumGameAssetFolder.dds_high;
-		GameLayaExtend.AssetFolder = EnumGameAssetFolder.dds_middle;
-		GameLayaExtend.AssetFolder = EnumGameAssetFolder.dds_low;
-		GameLayaURL.SetBasePath("../asset_platform", GameLayaExtend.AssetFolder);
+
+		// GameLayaExtend.AssetFolder = EnumGameAssetFolder.dds_high;
+		// GameLayaExtend.AssetFolder = EnumGameAssetFolder.dds_middle;
+		// GameLayaExtend.AssetFolder = EnumGameAssetFolder.dds_low;
+
+		// GameLayaExtend.AssetFolder = EnumGameAssetFolder.default_high;
+		// GameLayaExtend.AssetFolder = EnumGameAssetFolder.default_middle;
+		// GameLayaExtend.AssetFolder = EnumGameAssetFolder.default_low;
+		// GameLayaExtend.AssetFolder = EnumGameAssetFolder.pvr_high;
+		if (!window['wx']) alert(GameLayaExtend.AssetFolder)
+		GameLayaURL.SetBasePath("http://192.168.15.39:8901/asset_platform", GameLayaExtend.AssetFolder);
 		GameLayaURL.LoadExtReplaceConfig(Laya.Handler.create(null, () => {
 			GameLayaURL.InitCustomFormat();
 

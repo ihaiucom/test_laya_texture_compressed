@@ -60,46 +60,224 @@
     GameConfig.exportSceneToJson = true;
     GameConfig.init();
 
+    var EnumGameAssetFolder;
+    (function (EnumGameAssetFolder) {
+        EnumGameAssetFolder["default_high"] = "default_high";
+        EnumGameAssetFolder["default_middle"] = "default_middle";
+        EnumGameAssetFolder["default_low"] = "default_low";
+        EnumGameAssetFolder["dds_high"] = "dds_high";
+        EnumGameAssetFolder["dds_middle"] = "dds_middle";
+        EnumGameAssetFolder["dds_low"] = "dds_low";
+        EnumGameAssetFolder["astc_high"] = "astc_high";
+        EnumGameAssetFolder["astc_middle"] = "astc_middle";
+        EnumGameAssetFolder["astc_low"] = "astc_low";
+        EnumGameAssetFolder["pvr_high"] = "pvr_high";
+        EnumGameAssetFolder["pvr_middle"] = "pvr_middle";
+        EnumGameAssetFolder["pvr_low"] = "pvr_low";
+        EnumGameAssetFolder["etc_high"] = "etc_high";
+        EnumGameAssetFolder["etc_middle"] = "etc_middle";
+        EnumGameAssetFolder["etc_low"] = "etc_low";
+        EnumGameAssetFolder["ios_astc_high"] = "ios_astc_high";
+        EnumGameAssetFolder["ios_astc_middle"] = "ios_astc_middle";
+        EnumGameAssetFolder["ios_astc_low"] = "ios_astc_low";
+        EnumGameAssetFolder["android_astc_high"] = "android_astc_high";
+        EnumGameAssetFolder["android_astc_middle"] = "android_astc_middle";
+        EnumGameAssetFolder["android_astc_low"] = "android_astc_low";
+    })(EnumGameAssetFolder || (EnumGameAssetFolder = {}));
+
+    var EnumGameAssetLevel;
+    (function (EnumGameAssetLevel) {
+        EnumGameAssetLevel["high"] = "high";
+        EnumGameAssetLevel["middle"] = "middle";
+        EnumGameAssetLevel["low"] = "low";
+    })(EnumGameAssetLevel || (EnumGameAssetLevel = {}));
+
+    var EnumGamePaltformApp;
+    (function (EnumGamePaltformApp) {
+        EnumGamePaltformApp["Brower"] = "Brower";
+        EnumGamePaltformApp["Mini"] = "Mini";
+        EnumGamePaltformApp["App"] = "App";
+        EnumGamePaltformApp["Devtool"] = "Devtool";
+    })(EnumGamePaltformApp || (EnumGamePaltformApp = {}));
+
+    var EnumGamePaltformOS;
+    (function (EnumGamePaltformOS) {
+        EnumGamePaltformOS["windows"] = "windows";
+        EnumGamePaltformOS["mac"] = "mac";
+        EnumGamePaltformOS["android"] = "android";
+        EnumGamePaltformOS["ios"] = "ios";
+    })(EnumGamePaltformOS || (EnumGamePaltformOS = {}));
+
+    var EnumGameTextureExt;
+    (function (EnumGameTextureExt) {
+        EnumGameTextureExt["defalut"] = "defalut";
+        EnumGameTextureExt["dds"] = "dds";
+        EnumGameTextureExt["astc"] = "astc";
+        EnumGameTextureExt["pvr"] = "pvr";
+        EnumGameTextureExt["etc"] = "etc";
+    })(EnumGameTextureExt || (EnumGameTextureExt = {}));
+
     class GameLayaURL {
+        static SetBasePath(basePath, folder) {
+            Laya.URL.basePath = basePath + "/" + folder + "/";
+        }
+        static AsyncLoadExtReplaceConfig() {
+            return new Promise((resolve) => {
+                this.LoadExtReplaceConfig(Laya.Handler.create(null, () => {
+                    resolve();
+                }));
+            });
+        }
+        static LoadExtReplaceConfig(complete) {
+            Laya.loader.load("ext_replace.json", Laya.Handler.create(null, (json) => {
+                console.log(json);
+                this.ext_replace = json;
+                complete && complete.run();
+            }), null, Laya.Loader.JSON);
+        }
         static InitCustomFormat() {
             GameLayaURL.__src_customFormatExtReplace = Laya.URL.customFormat;
             Laya.URL.customFormatExtReplace = GameLayaURL.customFormatExtReplace;
         }
         static customFormatExtReplace(url) {
             var newUrl = url;
-            if (Laya.Browser.onPC) {
-                newUrl = newUrl.replace(".png", ".dds");
-            }
-            else if (Laya.Browser.onIOS) {
-                newUrl = newUrl.replace(".png", ".pvr");
-            }
-            else if (Laya.Browser.onAndroid) {
-                newUrl = newUrl.replace(".png", ".ktx");
+            var ext2 = GameLayaURL.ext_replace[url];
+            if (ext2) {
+                var ext = "." + Laya.Utils.getFileExtension(url);
+                newUrl = newUrl.replace(ext, ext2);
             }
             if (GameLayaURL.__src_customFormatExtReplace) {
                 newUrl = GameLayaURL.__src_customFormatExtReplace(newUrl);
             }
-            // console.log("【customFormat】url:", url);
-            // console.log("【customFormat】newUrl:", newUrl);
+            console.log("【customFormat】url:", url);
+            console.log("【customFormat】newUrl:", newUrl);
             return newUrl;
         }
     }
-    class GameAssetSettingItem {
+
+    class GameWebGLCompressedTexture {
+        static get s3tc() {
+            return Laya.LayaGL.layaGPUInstance._compressedTextureS3tc != null;
+        }
+        static get astc() {
+            return Laya.LayaGL.layaGPUInstance._compressedTextureASTC != null;
+        }
+        static get pvrtc() {
+            return Laya.LayaGL.layaGPUInstance._compressedTexturePvrtc != null;
+        }
+        static get etc() {
+            return Laya.LayaGL.layaGPUInstance._compressedTextureETC != null;
+        }
+        static get etc1() {
+            return Laya.LayaGL.layaGPUInstance._compressedTextureEtc1 != null;
+        }
     }
-    var EnumGameAssetPlatformType;
-    (function (EnumGameAssetPlatformType) {
-        EnumGameAssetPlatformType[EnumGameAssetPlatformType["Default"] = 0] = "Default";
-        EnumGameAssetPlatformType[EnumGameAssetPlatformType["PC"] = 1] = "PC";
-        EnumGameAssetPlatformType[EnumGameAssetPlatformType["Android"] = 2] = "Android";
-        EnumGameAssetPlatformType[EnumGameAssetPlatformType["Android_Web"] = 2] = "Android_Web";
-        EnumGameAssetPlatformType[EnumGameAssetPlatformType["Android_MiniGame"] = 2] = "Android_MiniGame";
-        EnumGameAssetPlatformType[EnumGameAssetPlatformType["iOS"] = 3] = "iOS";
-        EnumGameAssetPlatformType[EnumGameAssetPlatformType["iOS_Web"] = 4] = "iOS_Web";
-        EnumGameAssetPlatformType[EnumGameAssetPlatformType["iOS_MiniGame"] = 5] = "iOS_MiniGame";
-    })(EnumGameAssetPlatformType || (EnumGameAssetPlatformType = {}));
-    var EnumPlatformType;
-    (function (EnumPlatformType) {
-    })(EnumPlatformType || (EnumPlatformType = {}));
+
+    class GameLayaExtend {
+        static Init() {
+            window['GameWebGLCompressedTexture'] = GameWebGLCompressedTexture;
+            window['GameLayaURL'] = GameLayaURL;
+            window['GameLayaExtend'] = GameLayaExtend;
+            this.SetPaltformOS();
+            this.SetPaltformApp();
+            this.SetAssetFolder();
+        }
+        static get isLocal() {
+            if (this._isLocal === undefined) {
+                if (window['wx'] || window['conch']) {
+                    this._isLocal = false;
+                }
+                else {
+                    if (window && window.location && window.location.href) {
+                        this._isLocal = window.location.href.startsWith("file:") || window.location.host.startsWith("192");
+                    }
+                    else {
+                        this._isLocal = false;
+                    }
+                }
+            }
+            return this._isLocal;
+        }
+        static SetPaltformOS() {
+            var os = EnumGamePaltformOS.windows;
+            if (Laya.Browser.onIOS) {
+                os = EnumGamePaltformOS.ios;
+            }
+            else if (Laya.Browser.onAndroid) {
+                os = EnumGamePaltformOS.android;
+            }
+            else if (Laya.Browser.onMac) {
+                os = EnumGamePaltformOS.mac;
+            }
+            if (Laya.Browser.window && Laya.Browser.window.navigator) {
+                if (Laya.Browser.window.navigator.platform == "devtools") {
+                    os = EnumGamePaltformOS.windows;
+                }
+            }
+            this.PaltformOS = os;
+        }
+        static SetPaltformApp() {
+            var app = EnumGamePaltformApp.Brower;
+            if (Laya.Browser._isMiniGame) {
+                app = EnumGamePaltformApp.Mini;
+            }
+            else if (window.conch) {
+                app = EnumGamePaltformApp.App;
+            }
+            if (Laya.Browser.window && Laya.Browser.window.navigator) {
+                if (Laya.Browser.window.navigator.platform == "devtools") {
+                    app = EnumGamePaltformApp.Devtool;
+                }
+            }
+            this.PaltformApp = app;
+        }
+        static SetAssetFolder() {
+            let folder = EnumGameAssetFolder.default_high;
+            let os = "pc";
+            let ext = EnumGameTextureExt.defalut;
+            let level = EnumGameAssetLevel.high;
+            switch (this.PaltformOS) {
+                case EnumGamePaltformOS.windows:
+                case EnumGamePaltformOS.mac:
+                    os = "pc";
+                    break;
+                default:
+                    os = this.PaltformOS;
+                    break;
+            }
+            if (GameWebGLCompressedTexture.astc) {
+                ext = EnumGameTextureExt.astc;
+            }
+            else if (GameWebGLCompressedTexture.etc1) {
+                ext = EnumGameTextureExt.etc;
+            }
+            else if (GameWebGLCompressedTexture.pvrtc) {
+                ext = EnumGameTextureExt.pvr;
+            }
+            else if (GameWebGLCompressedTexture.s3tc) {
+                ext = EnumGameTextureExt.dds;
+            }
+            switch (this.PaltformApp) {
+                case EnumGamePaltformApp.Mini:
+                case EnumGamePaltformApp.Devtool:
+                    level = EnumGameAssetLevel.low;
+                    break;
+                case EnumGamePaltformApp.App:
+                    level = EnumGameAssetLevel.high;
+                    break;
+                case EnumGamePaltformApp.Brower:
+                    if (Laya.Browser.onMobile) {
+                        level = EnumGameAssetLevel.low;
+                    }
+                    else {
+                        level = EnumGameAssetLevel.high;
+                    }
+                    break;
+            }
+            folder = `${ext}_${level}`;
+            this.AssetFolder = folder;
+        }
+    }
 
     var Vector3 = Laya.Vector3;
     class TestScene extends Laya.Scene3D {
@@ -180,6 +358,8 @@
                 Laya.enableDebugPanel();
             if (GameConfig.physicsDebug && Laya["PhysicsDebugDraw"])
                 Laya["PhysicsDebugDraw"].enable();
+            if (GameConfig.stat)
+                Laya.Stat.show();
             Laya.alertGlobalError(true);
             this.scene = TestScene.create();
             Laya.stage.addChild(this.scene);
@@ -187,6 +367,7 @@
             let material = new Laya.UnlitMaterial();
             material.renderMode = Laya.UnlitMaterial.RENDERMODE_TRANSPARENT;
             box.meshRenderer.material = material;
+            this.scene.addChild(box);
             var gl = Laya['LayaGL'].instance;
             var availableExtensions = gl.getSupportedExtensions();
             var str = availableExtensions.join('\n');
@@ -208,7 +389,6 @@
             var sp = new Laya.Sprite();
             sp.name = "ZFSprite";
             window['sp'] = sp;
-            Laya.stage.addChild(sp);
             var txt = new Laya.TextArea();
             txt.name = "ZFTextArea";
             txt.text = str;
@@ -218,16 +398,16 @@
             txt.y = 20;
             txt.color = "#ff0000";
             Laya.stage.addChild(txt);
-            GameLayaURL.InitCustomFormat();
-            Laya.loader.create("http://192.168.15.39:8901/bin/res3d/Conventional/Quad.lh", Laya.Handler.create(null, (sprite3D) => {
-                window['sprite3D'] = sprite3D;
-                sprite3D.transform.localRotationEulerY = 180;
-                // this.scene.RotationTarget(sprite3D);
-                this.scene.addChild(sprite3D);
+            GameLayaExtend.Init();
+            if (!window['wx'])
+                alert(GameLayaExtend.AssetFolder);
+            GameLayaURL.SetBasePath("http://192.168.15.39:8901/asset_platform", GameLayaExtend.AssetFolder);
+            GameLayaURL.LoadExtReplaceConfig(Laya.Handler.create(null, () => {
+                GameLayaURL.InitCustomFormat();
+                Laya.loader.load("6.png", Laya.Handler.create(null, (tex) => {
+                    material.albedoTexture = tex;
+                }));
             }));
-
-            
-		    // sp.loadImage("http://192.168.15.39:8901/bin/6.png");
             window['renderNum'] = 0;
         }
         onVersionLoaded() {
