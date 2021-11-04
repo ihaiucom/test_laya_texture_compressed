@@ -1,0 +1,19 @@
+{
+  "name": "tool_laya_platform_asset",
+  "version": "1.0.0",
+  "description": "laya平台资源工具",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "laya",
+    "platform",
+    "asset"
+  ],
+  "author": "zengfeng75g@qq.com",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^16.11.6"
+  }
+}
