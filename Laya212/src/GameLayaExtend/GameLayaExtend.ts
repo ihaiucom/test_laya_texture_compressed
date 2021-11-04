@@ -128,7 +128,12 @@ export class GameLayaExtend {
                 level = EnumGameAssetLevel.high;
                 break;
             case EnumGamePaltformApp.Brower:
-                level = EnumGameAssetLevel.high;
+                if (Laya.Browser.onMobile) {
+                    level = EnumGameAssetLevel.low;
+                }
+                else {
+                    level = EnumGameAssetLevel.high;
+                }
                 break;
         }
 
