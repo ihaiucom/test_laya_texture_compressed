@@ -1,7 +1,7 @@
 /** 参数设置 */
-export class SettingArgv
-{
-    static srcDir: string = "./";
+export class SettingArgv {
+    static layaDir: string = "./";
+    static platformAssetDir = "./platform_asset/";
     static outDir: string = "./platform_package/";
-    static platform: string = "android_astc_low";
+    static platform: string = "astc_high";
 }

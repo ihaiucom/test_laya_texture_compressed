@@ -1,15 +1,96 @@
 import { argv } from "process";
+import fs from "fs";
+import path from "path";
+import { SettingArgv } from "./SettingArgv";
+import { FileUtils } from "./FileUtils";
+const colors = require('colors-console')
 
 const cmd = `
 Usage
-ts-node ./index.ts <input_directory> <output_directory> <platform>
+ts-node ./index.ts <laya_directory> <texture_directory> <output_directory> <platform>
 
 Example
-ts-node ./src/index.ts ./test/bin ./test/platform_package android_astc_low
+ts-node ./src/index.ts ./test/laya ./test/platform_asset ./test/platform_package/astc_high astc_high
 `;
-function main()
-{
+function main() {
     console.log(argv);
+    let cwdDir: string = process.cwd();
+    let layaDir = argv[2];
+    let platformAssetRootDir = argv[3];
+    let outDir = argv[4];
+    let platform = argv[5];
+    let platformAssetDir = path.join(platformAssetRootDir, platform);
+
+    // console.log('__dirname : ' + __dirname)
+    // console.log('resolve   : ' + path.resolve('./'))
+    // console.log('cwd       : ' + process.cwd())
+    // console.log(cwdDir);
+
+    if (!layaDir || !outDir) {
+        console.error("\n", colors('red', '[Error]'), `没有输入 input_directory 或者 output_directory`);
+        console.log(cmd);
+        return;
+    }
+
+    if (!platform) {
+        console.error("\n", colors('red', '[Error]'), "没有输入 platform");
+        console.log(cmd);
+        return;
+    }
+
+    fs.access(layaDir, fs.constants.F_OK, err => {
+        if (err) {
+            console.error("\n", colors('red', '[Error]'), '\x1B[46m input_directory \x1B[0m 不可访问!');
+            console.log(cmd);
+            return;
+        }
+
+
+        if (path.isAbsolute(layaDir)) {
+            SettingArgv.layaDir = path.normalize(layaDir);
+        }
+        else {
+            SettingArgv.layaDir = path.normalize(path.join(cwdDir, layaDir));
+        }
+
+        if (path.isAbsolute(platformAssetDir)) {
+            SettingArgv.platformAssetDir = path.normalize(platformAssetDir);
+        }
+        else {
+            SettingArgv.platformAssetDir = path.normalize(path.join(cwdDir, platformAssetDir));
+        }
+
+
+        if (path.isAbsolute(outDir)) {
+            SettingArgv.outDir = path.normalize(outDir);
+        }
+        else {
+            SettingArgv.outDir = path.normalize(path.join(cwdDir, outDir));
+        }
+
+
+        SettingArgv.platform = platform;
+
+        console.log("layaDir:", SettingArgv.layaDir);
+        console.log("platformAssetDir:", SettingArgv.platformAssetDir);
+        console.log("outDir:", SettingArgv.outDir);
+
+
+        FileUtils.copy(SettingArgv.layaDir + "/laya.laya", SettingArgv.outDir + "/laya.laya", true);
+        FileUtils.copy(SettingArgv.layaDir + "/tsconfig.json", SettingArgv.outDir + "/tsconfig.json", true);
+        FileUtils.copy(SettingArgv.layaDir + "/.vscode", SettingArgv.outDir + "/.vscode", true);
+        FileUtils.copy(SettingArgv.layaDir + "/.gitignore", SettingArgv.outDir + "/.gitignore", true);
+        FileUtils.copy(SettingArgv.layaDir + "/.laya", SettingArgv.outDir + "/.laya", true, ['.js', '.json']);
+
+
+        FileUtils.copy(SettingArgv.layaDir + "/bin", SettingArgv.outDir + "/bin", true, undefined, ['.png', '.jpg', '.jpeg']);
+
+
+        // FileUtils.copy(SettingArgv.layaDir + "/bin", SettingArgv.outDir, true, undefined, ['.png', '.jpg', '.jpeg']);
+        // FileUtils.copy(SettingArgv.platformAssetDir, SettingArgv.outDir, true);
+    });
+
+
 }
 
 main();

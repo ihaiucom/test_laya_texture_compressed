@@ -8,6 +8,7 @@ export class GameLayaURL {
 
     static SetBasePath(basePath: string, folder: EnumGameAssetFolder) {
         Laya.URL.basePath = basePath + "/" + folder + "/";
+        // Laya.URL.basePath = basePath + "/";
     }
 
     /** 加载 ext_replace.json */
@@ -40,8 +41,9 @@ export class GameLayaURL {
         var newUrl = url;
         var ext2 = GameLayaURL.ext_replace[url];
         if (ext2) {
-            var ext: string = "." + Laya.Utils.getFileExtension(url);
-            newUrl = newUrl.replace(ext, ext2);
+            // var ext: string = "." + Laya.Utils.getFileExtension(url);
+            // newUrl = newUrl.replace(ext, ext2);
+            newUrl = ext2
         }
 
         if (GameLayaURL.__src_customFormatExtReplace) {

@@ -39,7 +39,7 @@ class Main {
 		let material = new Laya.UnlitMaterial();
 		material.renderMode = Laya.UnlitMaterial.RENDERMODE_TRANSPARENT
 		box.meshRenderer.material = material;
-		this.scene.addChild(box);
+		// this.scene.addChild(box);
 
 
 
@@ -105,17 +105,17 @@ class Main {
 		GameLayaURL.LoadExtReplaceConfig(Laya.Handler.create(null, () => {
 			GameLayaURL.InitCustomFormat();
 
-			Laya.loader.load("6.png", Laya.Handler.create(null, (tex: Laya.Texture2D) => {
-				material.albedoTexture = tex;
-			}));
+			// Laya.loader.load("6.png", Laya.Handler.create(null, (tex: Laya.Texture2D) => {
+			// 	material.albedoTexture = tex;
+			// }));
 
 
-			// Laya.loader.create("res3d/Conventional/Quad.lh", Laya.Handler.create(null, (sprite3D: Laya.Sprite3D) => {
-			// 	window['sprite3D'] = sprite3D;
-			// 	sprite3D.transform.localRotationEulerY = 180;
-			// 	// this.scene.RotationTarget(sprite3D);
-			// 	this.scene.addChild(sprite3D);
-			// }))
+			Laya.loader.create("res3d/Conventional/Quad.lh", Laya.Handler.create(null, (sprite3D: Laya.Sprite3D) => {
+				window['sprite3D'] = sprite3D;
+				sprite3D.transform.localRotationEulerY = 180;
+				// this.scene.RotationTarget(sprite3D);
+				this.scene.addChild(sprite3D);
+			}))
 		}));
 
 

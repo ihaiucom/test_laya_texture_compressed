@@ -10,6 +10,7 @@ const cmd = "\n Usage\n   ts-node ./index.ts <input_directory> <output_directory
 async function Init()
 {
     const rootDir: string = path.dirname(argv[1]);
+    const cwdDir: string = process.cwd();
     const srcDir: string = argv[2];
     const outDir: string = argv[3] ? argv[3] : Config.OUT_ROOT_DIR;
     const speed: string = argv[4];
@@ -23,6 +24,8 @@ async function Init()
         console.log(cmd);
         return;
     }
+
+    Config.TOOL_ROOT_DIR = rootDir;
     fs.access(srcDir,fs.constants.F_OK,err =>
     {
         if(err)
@@ -37,7 +40,7 @@ async function Init()
         }
         else
         {
-            Config.SRC_ROOT_DIR = path.normalize(path.join(rootDir,srcDir));
+            Config.SRC_ROOT_DIR = path.normalize(path.join(cwdDir,srcDir));
         }
         if(path.isAbsolute(outDir))
         {
@@ -45,7 +48,7 @@ async function Init()
         }
         else
         {
-            Config.OUT_ROOT_DIR = path.normalize(path.join(rootDir,outDir));
+            Config.OUT_ROOT_DIR = path.normalize(path.join(cwdDir,outDir));
         }
         if(speed && eCompressionSpeed[speed])
         {

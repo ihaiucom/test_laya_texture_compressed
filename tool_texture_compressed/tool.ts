@@ -3,6 +3,8 @@
  */
 
 import {ChildProcess} from "child_process";
+import path from "path";
+import {Config} from "./Config";
 import {eAstcBlockSize,eAstcencModes,eAstcSpeed,eEtcFromat,eEtcSpeed,eExtType,ePvrFormat,ePvrQuality,ImageStruct} from "./Define";
 
 const {spawn,spawnSync} = require('child_process');
@@ -73,6 +75,9 @@ export async function Image2PngSync(image: ImageStruct,quality: number): Promise
 
 async function RunToolSync(tool: string,param: string[],image: ImageStruct,outFile: string): Promise<ImageStruct>
 {
+
+    tool = path.normalize(path.join(Config.TOOL_ROOT_DIR,tool));
+
     param = param.join(" ").split(" ");
     let now: number = Date.now();
     const process: ChildProcess = await spawnSync(tool,param)
