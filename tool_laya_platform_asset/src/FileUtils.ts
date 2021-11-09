@@ -4,6 +4,8 @@ import fs from "fs";
 // XCOPY /Y /S .\test\bin\**.png .\test\platform_package\astc_high\bin
 export class FileUtils {
 
+    static IMAGE_EXT = ['.png', '.jpg', '.jpeg'];
+
     //获取文件的后后缀名
     static getSuffix(url: string) {
         var lastIndex = url.lastIndexOf('.');

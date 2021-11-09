@@ -1,0 +1,15 @@
+export enum EnumAstcBlockSize {
+    size_4x4 = "4x4",
+    size_5x4 = "5x4",
+    size_6x5 = "6x5",
+    size_6x6 = "6x6",
+    size_8x5 = "8x5",
+    size_8x6 = "8x6",
+    size_10x5 = "10x5",
+    size_10x6 = "10x6",
+    size_8x8 = "8x8",
+    size_10x8 = "10x8",
+    size_10x10 = "10x10",
+    size_12x10 = "12x10",
+    size_12x12 = "12x12",
+}

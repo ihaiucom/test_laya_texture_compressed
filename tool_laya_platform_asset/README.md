@@ -7,3 +7,7 @@ ts-node ./src/index.ts D:\zengfeng\GameJJSG2021\client\laya\bin ./test/platform_
 XCOPY /S/Y D:\zengfeng\GameJJSG2021\client\laya\bin\**.png .\test\platform_asset\default_high
 XCOPY /S/Y D:\zengfeng\GameJJSG2021\client\laya\bin\**.jpg .\test\platform_asset\default_high
 
+
+// convert ./test/platform_asset/default_high/res/fgui/**.png -resize '50%' ./test/platform_asset/default_middle/res/fgui/
+
+ ts-node ./src/index.ts resize -s '50%'  -i ./test/platform_asset/default_high -o ./test/platform_asset/default_middle -q 100

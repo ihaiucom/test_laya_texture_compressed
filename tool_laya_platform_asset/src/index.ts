@@ -1,96 +1,30 @@
-import { argv } from "process";
-import fs from "fs";
-import path from "path";
-import { SettingArgv } from "./SettingArgv";
-import { FileUtils } from "./FileUtils";
-const colors = require('colors-console')
+
+import { Command } from 'commander';
+import path from 'path';
+import { Tool } from './Tool';
+
+let rootPath = path.normalize(path.join(process.argv[1], "../../"));
+let toolPath = path.normalize(path.join(rootPath, "./tool/"));
+Tool.TOOL_ROOT_DIR = toolPath;
+
+const commander = new Command();
+// 程序参数
+commander
+    .version('1.0.0', '-v, --version')
+    .usage("[command] [args]")
+    .command('copyproject', '拷贝laya工程.')
+    .command('resize', '缩放图片.')
+    .command('compressed', '压缩图片.')
+    .parse(process.argv);
 
 const cmd = `
 Usage
-ts-node ./index.ts <laya_directory> <texture_directory> <output_directory> <platform>
+ts-node ./index.ts copyproject <laya_directory> <texture_directory> <output_directory> <platform>
+ts-node ./index.ts resize <size> <texture_directory> <output_directory>
+ts-node ./index.ts compressed <ext> <texture_directory> <output_directory>
 
 Example
-ts-node ./src/index.ts ./test/laya ./test/platform_asset ./test/platform_package/astc_high astc_high
+ts-node ./src/index.ts copy ./test/laya ./test/platform_asset ./test/platform_package/astc_high astc_high
+ts-node ./src/index.ts resize ’50%‘ ./test/platform_asset/default_high ./test/platform_asset/default_middle
+ts-node ./src/index.ts compressed astc ./test/platform_asset/default_high ./test/platform_asset/astc_high
 `;
-function main() {
-    console.log(argv);
-    let cwdDir: string = process.cwd();
-    let layaDir = argv[2];
-    let platformAssetRootDir = argv[3];
-    let outDir = argv[4];
-    let platform = argv[5];
-    let platformAssetDir = path.join(platformAssetRootDir, platform);
-
-    // console.log('__dirname : ' + __dirname)
-    // console.log('resolve   : ' + path.resolve('./'))
-    // console.log('cwd       : ' + process.cwd())
-    // console.log(cwdDir);
-
-    if (!layaDir || !outDir) {
-        console.error("\n", colors('red', '[Error]'), `没有输入 input_directory 或者 output_directory`);
-        console.log(cmd);
-        return;
-    }
-
-    if (!platform) {
-        console.error("\n", colors('red', '[Error]'), "没有输入 platform");
-        console.log(cmd);
-        return;
-    }
-
-    fs.access(layaDir, fs.constants.F_OK, err => {
-        if (err) {
-            console.error("\n", colors('red', '[Error]'), '\x1B[46m input_directory \x1B[0m 不可访问!');
-            console.log(cmd);
-            return;
-        }
-
-
-        if (path.isAbsolute(layaDir)) {
-            SettingArgv.layaDir = path.normalize(layaDir);
-        }
-        else {
-            SettingArgv.layaDir = path.normalize(path.join(cwdDir, layaDir));
-        }
-
-        if (path.isAbsolute(platformAssetDir)) {
-            SettingArgv.platformAssetDir = path.normalize(platformAssetDir);
-        }
-        else {
-            SettingArgv.platformAssetDir = path.normalize(path.join(cwdDir, platformAssetDir));
-        }
-
-
-        if (path.isAbsolute(outDir)) {
-            SettingArgv.outDir = path.normalize(outDir);
-        }
-        else {
-            SettingArgv.outDir = path.normalize(path.join(cwdDir, outDir));
-        }
-
-
-        SettingArgv.platform = platform;
-
-        console.log("layaDir:", SettingArgv.layaDir);
-        console.log("platformAssetDir:", SettingArgv.platformAssetDir);
-        console.log("outDir:", SettingArgv.outDir);
-
-
-        FileUtils.copy(SettingArgv.layaDir + "/laya.laya", SettingArgv.outDir + "/laya.laya", true);
-        FileUtils.copy(SettingArgv.layaDir + "/tsconfig.json", SettingArgv.outDir + "/tsconfig.json", true);
-        FileUtils.copy(SettingArgv.layaDir + "/.vscode", SettingArgv.outDir + "/.vscode", true);
-        FileUtils.copy(SettingArgv.layaDir + "/.gitignore", SettingArgv.outDir + "/.gitignore", true);
-        FileUtils.copy(SettingArgv.layaDir + "/.laya", SettingArgv.outDir + "/.laya", true, ['.js', '.json']);
-
-
-        FileUtils.copy(SettingArgv.layaDir + "/bin", SettingArgv.outDir + "/bin", true, undefined, ['.png', '.jpg', '.jpeg']);
-
-
-        // FileUtils.copy(SettingArgv.layaDir + "/bin", SettingArgv.outDir, true, undefined, ['.png', '.jpg', '.jpeg']);
-        // FileUtils.copy(SettingArgv.platformAssetDir, SettingArgv.outDir, true);
-    });
-
-
-}
-
-main();
