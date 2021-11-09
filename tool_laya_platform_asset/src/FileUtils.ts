@@ -191,7 +191,7 @@ export class FileUtils {
     }
 
     // 读取文件
-    static read(srcPath: string, encoding: BufferEncoding = "utf8", flag: string = "a",) {
+    static read(srcPath: string, encoding: BufferEncoding = "utf8", flag: string = "r") {
         if (!fs.existsSync(srcPath)) {
             return "";
         }

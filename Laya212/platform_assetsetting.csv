@@ -1,0 +1,3 @@
+path,android_high,android_low,pc_low
+default,etc_high,etc_low,dds_low
+res/1.png,etc_high,etc_low,dds_low

@@ -24,7 +24,7 @@ ts-node ./index.ts resize <size> <texture_directory> <output_directory>
 ts-node ./index.ts compressed <ext> <texture_directory> <output_directory>
 
 Example
-ts-node ./src/index.ts copy ./test/laya ./test/platform_asset ./test/platform_package/astc_high astc_high
+ts-node ./src/index.ts copyproject ./test/laya ./test/platform_asset ./test/platform_package/astc_high astc_high
 ts-node ./src/index.ts resize ’50%‘ ./test/platform_asset/default_high ./test/platform_asset/default_middle
 ts-node ./src/index.ts compressed astc ./test/platform_asset/default_high ./test/platform_asset/astc_high
 `;
