@@ -22,7 +22,7 @@ export class GameLayaURL {
 
     /** 加载 ext_replace.json */
     static LoadExtReplaceConfig(complete: Handler) {
-        Laya.loader.load("ext_replace.json", Laya.Handler.create(null, (json) => {
+        Laya.loader.load("asset_url_replace.json", Laya.Handler.create(null, (json) => {
             console.log(json);
             this.ext_replace = json;
             complete && complete.run();

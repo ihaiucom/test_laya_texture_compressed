@@ -129,7 +129,7 @@
             });
         }
         static LoadExtReplaceConfig(complete) {
-            Laya.loader.load("ext_replace.json", Laya.Handler.create(null, (json) => {
+            Laya.loader.load("asset_url_replace.json", Laya.Handler.create(null, (json) => {
                 console.log(json);
                 this.ext_replace = json;
                 complete && complete.run();
@@ -397,9 +397,6 @@
             txt.color = "#ff0000";
             Laya.stage.addChild(txt);
             GameLayaExtend.Init();
-            if (!window['wx'])
-                alert(GameLayaExtend.AssetFolder);
-            GameLayaURL.SetBasePath("http://192.168.15.39:8901/asset_platform", GameLayaExtend.AssetFolder);
             GameLayaURL.LoadExtReplaceConfig(Laya.Handler.create(null, () => {
                 GameLayaURL.InitCustomFormat();
                 Laya.loader.create("res3d/Conventional/Quad.lh", Laya.Handler.create(null, (sprite3D) => {

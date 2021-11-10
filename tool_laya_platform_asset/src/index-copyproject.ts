@@ -4,11 +4,8 @@ import path from "path";
 import { FileUtils } from "./FileUtils";
 import { stringify } from "querystring";
 import { EnumExt } from "./EnumExt";
-
-interface ImageFile {
-    srcPath: string;
-    destPath?: string | undefined;
-}
+import { ImageFile } from "./ImageCompressedUtils";
+import { FileCopyUtils } from "./FileCopyUtils";
 
 export class CsvParse {
 
@@ -157,8 +154,11 @@ function copyproject() {
     let imageList: ImageFile[] = copylaya();
     let imagePathList: string[] = [];
     for (let item of imageList) {
+        let ext = path.extname(item.srcPath);
+        if (FileUtils.IMAGE_EXT.indexOf(ext) == -1) {
+            continue;
+        }
         item.srcPath = path.relative(layaWorkspaceBin, item.srcPath).replace(/\\/g, '/');
-        item.destPath = undefined;
         imagePathList.push(item.srcPath);
     }
 
@@ -187,7 +187,7 @@ function copylaya() {
 
 
     let imageList: ImageFile[] = [];
-    copy(imageList, layaWorkspaceBin, outputPathBin, true, undefined, FileUtils.IMAGE_EXT, false);
+    FileCopyUtils.copy(imageList, layaWorkspaceBin, outputPathBin, true, undefined, FileUtils.IMAGE_EXT2, false);
 
 
     // FileUtils.copy(layaDir + "/bin", outDir, true, undefined, ['.png', '.jpg', '.jpeg']);
@@ -233,100 +233,6 @@ function copytexture(imagePathList: string[]) {
 }
 
 
-// 拷贝文件
-function copy(imageList: ImageFile[], srcPath: string, destPath: string, isOver = true, exts?: string[], imageExts?: string[], isCopyImage: boolean = false, isIgnoreHide = true) {
-    srcPath = FileUtils.getAbsolutePath(srcPath);
-    destPath = FileUtils.getAbsolutePath(destPath);
-    if (srcPath == destPath) {
-        console.warn("拷贝路径一样", srcPath);
-        return;
-    }
-
-    if (!fs.existsSync(srcPath)) {
-        console.warn("文件不存在:", srcPath);
-        return;
-    }
-
-
-    var stat = fs.lstatSync(srcPath);
-    if (stat.isFile()) {
-        copyFile(imageList, srcPath, destPath, isOver, exts, imageExts, isCopyImage);
-    }
-    else {
-        var paths = fs.readdirSync(srcPath); //同步读取当前目录
-        for (var i = 0, len = paths.length; i < len; i++) {
-            var name = paths[i];
-            if (isIgnoreHide) {
-                if (name.startsWith(".")) {
-                    continue;
-                }
-            }
-            var itemSrc = path.join(srcPath, name);
-            var itemDest = path.join(destPath, name);
-            var stat = fs.lstatSync(itemSrc);
-            if (stat.isFile()) {
-                copyFile(imageList, itemSrc, itemDest, isOver, exts, imageExts, isCopyImage);
-            }
-            else if (stat.isDirectory()) {
-                if (itemDest.startsWith(itemSrc)) {
-                    console.warn("拷贝路径嵌套死循环", itemSrc, "   ", itemDest);
-                    continue;
-                }
-                copy(imageList, itemSrc, itemDest, isOver, exts, imageExts, isIgnoreHide);
-
-            }
-
-        }
-
-    }
-
-}
-
-function copyFile(imageList: ImageFile[], srcPath: string, destPath: string, isOver: boolean, exts?: string[], imageExts?: string[], isCopyImage?: boolean) {
-
-    if (exts || imageExts) {
-        let ext = path.extname(srcPath);
-
-        let isImage = false;
-        if (imageExts && imageExts.length > 0) {
-            if (imageExts.indexOf(ext) != -1) {
-                isImage = true;
-                imageList.push({ srcPath: srcPath, destPath: destPath });
-            }
-        }
-
-        if (isCopyImage) {
-            if (!isImage) {
-                return;
-            }
-        }
-        else {
-            if (exts && exts.length > 0) {
-                if (exts.indexOf(ext) == -1) {
-                    return;
-                }
-            }
-
-            if (isImage) {
-                return;
-            }
-        }
-    }
-
-
-    if (isOver) {
-        if (fs.existsSync(destPath)) {
-            fs.unlinkSync(destPath);
-        }
-
-        FileUtils.checkDirPath(destPath);
-        fs.copyFileSync(srcPath, destPath);
-    }
-    else if (!fs.existsSync(destPath)) {
-        FileUtils.checkDirPath(destPath);
-        fs.copyFileSync(srcPath, destPath);
-    }
-}
 
 AssetSettingManager.I.Load(assetsettingPath);
 copyproject();

@@ -10,7 +10,7 @@ commander
 tool-laya-platform resize <size> <quality> <inputTexturePath> <outputTexturePath>
 
 Example
-tool-laya-platform resize '50%' ./test/platform_asset/default_high ./test/platform_asset/default_middle
+tool-laya-platform resize  -s '50%' ./test/platform_asset/default_high ./test/platform_asset/default_middle
 
 ts-node ./src/index.ts resize -s '50%' -q 70 -i ./test/platform_asset/default_high -o ./test/platform_asset/default_middle
     `)

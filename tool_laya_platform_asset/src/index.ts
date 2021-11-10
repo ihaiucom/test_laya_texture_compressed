@@ -12,9 +12,10 @@ const commander = new Command();
 commander
     .version('1.0.0', '-v, --version')
     .usage("[command] [args]")
-    .command('copyproject', '拷贝laya工程.')
+    .command('copyimage', '拷贝图片.')
     .command('resize', '缩放图片.')
     .command('compressed', '压缩图片.')
+    .command('copyproject', '拷贝laya工程.')
     .parse(process.argv);
 
 const cmd = `
