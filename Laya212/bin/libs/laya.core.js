@@ -1,4 +1,4 @@
-window.Laya= (function (exports) {
+window.Laya = (function (exports) {
     'use strict';
 
     class Config {
@@ -2366,6 +2366,11 @@ window.Laya= (function (exports) {
     class Texture2D extends BaseTexture {
         constructor(width = 0, height = 0, format = exports.TextureFormat.R8G8B8A8, mipmap = true, canRead = false) {
             super(format, mipmap);
+
+            // TODO TEST
+            if (width == 512 && height == 256) {
+                console.log(this);
+            }
             var gl = LayaGL.instance;
             this._glTextureType = gl.TEXTURE_2D;
             this._width = width;
@@ -2580,7 +2585,7 @@ window.Laya= (function (exports) {
                 throw "Unsupported format, must contain a FourCC code";
             var compressedFormat = header[DDS_HEADER_PF_FOURCC];
 
-            
+
             // TODO ZF 从文件里读取格式
             switch (compressedFormat) {
                 case FOURCC_DXT1:
@@ -2590,7 +2595,7 @@ window.Laya= (function (exports) {
                     this._format = exports.TextureFormat.DXT5;
                     break;
             }
-            
+
             switch (this._format) {
                 case exports.TextureFormat.DXT1:
                     if (compressedFormat !== FOURCC_DXT1)
@@ -2621,8 +2626,8 @@ window.Laya= (function (exports) {
             var dataOffset = header[DDS_HEADER_SIZE] + 4;
             this._upLoadCompressedTexImage2D(arrayBuffer, width, height, mipLevels, dataOffset, 0);
         }
-        
-        
+
+
         // TODO ZF astc贴图解析
         _pharseASTC(arrayBuffer) {
 
@@ -2630,13 +2635,13 @@ window.Laya= (function (exports) {
             const ASTC_MAGIC = 0x5CA1AB13;
             const ASTC_HEADER_MAGIC = 4;
             const ASTC_HEADER_LENGTH = 16; // The header length
-            
+
             const ASTC_HEADER_SIZE_X_BEGIN = 7;
             const ASTC_HEADER_SIZE_Y_BEGIN = 10;
             const ASTC_HEADER_SIZE_Z_BEGIN = 13;
 
             var header = new Uint8Array(arrayBuffer);
-            
+
             const magicval = header[0] + (header[1] << 8) + (header[2] << 16) + (header[3] << 24);
             if (magicval !== ASTC_MAGIC) {
                 throw new Error('Invalid magic number in ASTC header');
@@ -2647,10 +2652,10 @@ window.Laya= (function (exports) {
             const zdim = header[ASTC_HEADER_MAGIC + 2];
             if ((xdim < 3 || xdim > 6 || ydim < 3 || ydim > 6 || zdim < 3 || zdim > 6)
                 && (xdim < 4 || xdim === 7 || xdim === 9 || xdim === 11 || xdim > 12
-                || ydim < 4 || ydim === 7 || ydim === 9 || ydim === 11 || ydim > 12 || zdim !== 1)) {
+                    || ydim < 4 || ydim === 7 || ydim === 9 || ydim === 11 || ydim > 12 || zdim !== 1)) {
                 throw new Error('Invalid block number in ASTC header');
             }
-            
+
             const glFormat = ZF_ASTC.GetFormats(xdim, ydim, zdim);
             const width = header[ASTC_HEADER_SIZE_X_BEGIN] + (header[ASTC_HEADER_SIZE_X_BEGIN + 1] << 8) + (header[ASTC_HEADER_SIZE_X_BEGIN + 2] << 16);
             const height = header[ASTC_HEADER_SIZE_Y_BEGIN] + (header[ASTC_HEADER_SIZE_Y_BEGIN + 1] << 8) + (header[ASTC_HEADER_SIZE_Y_BEGIN + 2] << 16);
@@ -2658,32 +2663,32 @@ window.Laya= (function (exports) {
 
 
             const astcData = new Uint8Array(arrayBuffer, ASTC_HEADER_LENGTH);
-            
+
 
             this._width = width;
             this._height = height;
             this._upLoadASTCCompressedTexImage2D(astcData, width, height, glFormat);
         }
 
-        
+
         _upLoadASTCCompressedTexImage2D(astcDataUint8Array, width, height, glFormat) {
             var gl = LayaGL.instance;
             var textureType = this._glTextureType;
             WebGLContext.bindTexture(gl, textureType, this._glTexture);
             var offset = astcDataUint8Array.length;
-        
+
             console.log(` gl.compressedTexImage2D width=${width}, height=${height}, miplevel=0, glFormat=${glFormat}, textureType=${textureType}`);
-         
-          
+
+
             gl.compressedTexImage2D(textureType, 0, glFormat, width, height, 0, astcDataUint8Array);
-        
+
             var memory = offset;
             this._setGPUMemory(memory);
             this._readyed = true;
             this._activeResource();
         }
 
-        
+
 
         _pharseKTX(arrayBuffer) {
             const ETC_HEADER_LENGTH = 13;
@@ -2803,7 +2808,7 @@ window.Laya= (function (exports) {
                     this._format = exports.TextureFormat.PVRTCRGBA_2BPPV;
                     break;
             }
-            
+
             var mipLevels = header[PVR_HEADER_MIPMAPCOUNT];
             var width = header[PVR_HEADER_WIDTH];
             var height = header[PVR_HEADER_HEIGHT];
@@ -2953,7 +2958,7 @@ window.Laya= (function (exports) {
                 case exports.TextureFormat.DDSTEXTURE: // TODO ZF dds图片
                     this._pharseDDS(data);
                     break;
-                  // TODO ZF  将astc独立出来解析
+                // TODO ZF  将astc独立出来解析
                 case exports.TextureFormat.ASTC4x4:
                 case exports.TextureFormat.ASTC4x4SRGB:
                 case exports.TextureFormat.ASTC6x6:
@@ -5828,8 +5833,9 @@ window.Laya= (function (exports) {
             }
             this._vao.bind();
             this._vb._bindForVAO();
-            this._ib.setNeedUpload();
-            this._ib._bind_uploadForVAO();
+            // TODO ZF Chrome 96 注释掉下面两行
+            // this._ib.setNeedUpload();	//vao的话，必须要绑定ib。即使是共享的别人的。
+            // this._ib._bind_uploadForVAO();
             var attribNum = this._attribInfo.length / 3;
             var idx = 0;
             for (var i = 0; i < attribNum; i++) {
@@ -5846,7 +5852,12 @@ window.Laya= (function (exports) {
             this._applied || this.configVAO(gl);
             this._vao.bind();
             this._vb.bind();
-            this._ib._bind_upload() || this._ib.bind();
+
+            // TODO ZF Chrome 96 修改前
+            // this._ib._bind_upload() || this._ib.bind();
+            // TODO ZF Chrome 96 修改后
+            this._ib._bind_upload() || this._ib._bindForVAO();
+
             this._vb._bind_upload() || this._vb.bind();
         }
         getEleNum() {
@@ -7607,6 +7618,10 @@ window.Laya= (function (exports) {
     class Texture extends EventDispatcher {
         constructor(bitmap = null, uv = null, sourceWidth = 0, sourceHeight = 0) {
             super();
+            // TODO TEST
+            if (sourceWidth == 512) {
+                console.log(this);
+            }
             this.uvrect = [0, 0, 1, 1];
             this._destroyed = false;
             this._referenceCount = 0;
@@ -7632,9 +7647,27 @@ window.Laya= (function (exports) {
             return Texture._create(source, x, y, width, height, offsetX, offsetY, sourceWidth, sourceHeight);
         }
         static _create(source, x, y, width, height, offsetX = 0, offsetY = 0, sourceWidth = 0, sourceHeight = 0, outTexture = null) {
+
+
+            // TODO ZF UI图片缩放
+            var btex = source instanceof Texture;
+            var bitmap = btex ? source.bitmap : source;
+            if (bitmap) {
+                // if (bitmap.url == "fgui_low/Test3_atlas1.png") 
+                {
+                    // bitmap.scaleRate = 0.5;
+                }
+                var scaleRate = bitmap.scaleRate ? bitmap.scaleRate : 1;
+
+                x *= scaleRate;
+                y *= scaleRate;
+                width *= scaleRate;
+                height *= scaleRate;
+
+            }
+
             var btex = source instanceof Texture;
             var uv = btex ? source.uv : Texture.DEF_UV;
-            var bitmap = btex ? source.bitmap : source;
             if (bitmap.width && (x + width) > bitmap.width)
                 width = bitmap.width - x;
             if (bitmap.height && (y + height) > bitmap.height)
@@ -7647,6 +7680,9 @@ window.Laya= (function (exports) {
             else {
                 tex = new Texture(bitmap, null, sourceWidth || width, sourceHeight || height);
             }
+            // TODO ZF
+            tex.scaleRate = scaleRate;
+
             tex.width = width;
             tex.height = height;
             tex.offsetX = offsetX;
@@ -7661,13 +7697,14 @@ window.Laya= (function (exports) {
             var inAltasUVWidth = (u2 - u1), inAltasUVHeight = (v2 - v1);
             var oriUV = Texture.moveUV(uv[0], uv[1], [x, y, x + width, y, x + width, y + height, x, y + height]);
             tex.uv = new Float32Array([u1 + oriUV[0] * inAltasUVWidth, v1 + oriUV[1] * inAltasUVHeight,
-                u2 - (1 - oriUV[2]) * inAltasUVWidth, v1 + oriUV[3] * inAltasUVHeight,
-                u2 - (1 - oriUV[4]) * inAltasUVWidth, v2 - (1 - oriUV[5]) * inAltasUVHeight,
-                u1 + oriUV[6] * inAltasUVWidth, v2 - (1 - oriUV[7]) * inAltasUVHeight]);
+            u2 - (1 - oriUV[2]) * inAltasUVWidth, v1 + oriUV[3] * inAltasUVHeight,
+            u2 - (1 - oriUV[4]) * inAltasUVWidth, v2 - (1 - oriUV[5]) * inAltasUVHeight,
+            u1 + oriUV[6] * inAltasUVWidth, v2 - (1 - oriUV[7]) * inAltasUVHeight]);
             var bitmapScale = bitmap.scaleRate;
             if (bitmapScale && bitmapScale != 1) {
-                tex.sourceWidth /= bitmapScale;
-                tex.sourceHeight /= bitmapScale;
+                // TODO ZF Test
+                // tex.sourceWidth /= bitmapScale;
+                // tex.sourceHeight /= bitmapScale;
                 tex.width /= bitmapScale;
                 tex.height /= bitmapScale;
                 tex.scaleRate = bitmapScale;
@@ -7751,8 +7788,8 @@ window.Laya= (function (exports) {
             return this._bitmap.destroyed ? null : this.bitmap._getSource();
         }
         _onLoaded(complete, context) {
-            if (!context) ;
-            else if (context == this) ;
+            if (!context);
+            else if (context == this);
             else if (context instanceof Texture) {
                 var tex = context;
                 Texture._create(context, 0, 0, tex.width, tex.height, 0, 0, tex.sourceWidth, tex.sourceHeight, this);
@@ -7786,13 +7823,11 @@ window.Laya= (function (exports) {
             //     ILaya.loader.load(url, Handler.create(this, this._onLoaded, [complete]), null, "htmlimage", 1, true);
 
             // TODO ZF 之后, 2d Texture load
-            if (!this._destroyed)
-            {
+            if (!this._destroyed) {
                 var newUrl = URL.customFormatExtReplace ? URL.customFormatExtReplace(url) : url;
-			    var ext = Utils.getFileExtension(newUrl);
+                var ext = Utils.getFileExtension(newUrl);
                 var type = "htmlimage";
-                switch(ext)
-                {
+                switch (ext) {
                     case "ktx":
                     case "pvr":
                     case "dds":
@@ -7869,9 +7904,9 @@ window.Laya= (function (exports) {
                 var uk = uvw / texw;
                 var vk = uvh / texh;
                 uv = [stu + rePosX * uk, stv + rePosY * vk,
-                    stu + (rePosX + draww) * uk, stv + rePosY * vk,
-                    stu + (rePosX + draww) * uk, stv + (rePosY + drawh) * vk,
-                    stu + rePosX * uk, stv + (rePosY + drawh) * vk];
+                stu + (rePosX + draww) * uk, stv + rePosY * vk,
+                stu + (rePosX + draww) * uk, stv + (rePosY + drawh) * vk,
+                stu + rePosX * uk, stv + (rePosY + drawh) * vk];
             }
             ctx._drawTextureM(this, marginL, marginT, draww, drawh, null, 1.0, uv);
             ctx._targets.start();
@@ -8631,7 +8666,7 @@ window.Laya= (function (exports) {
                     state = 1;
                     i++;
                 }
-                else if (c === 0xfe0e || c === 0xfe0f) ;
+                else if (c === 0xfe0e || c === 0xfe0f);
                 else if (c == 0x200d) {
                     state = 2;
                 }
@@ -8754,7 +8789,7 @@ window.Laya= (function (exports) {
                         if (!ri) {
                             break;
                         }
-                        if (ri.isSpace) ;
+                        if (ri.isSpace);
                         else {
                             var add = sameTexData[ri.tex.id];
                             if (!add) {
@@ -14991,7 +15026,7 @@ window.Laya= (function (exports) {
             //     // if(this.name == "ZFSprite")
             //     // {
             //     //     console.log("【Sprite render】" + this.name, this.constructor.name, this._renderType, RenderSprite.renders[this._renderType]._fun, RenderSprite.renders[this._renderType]);
-                
+
             //     // }
             // }
             RenderSprite.renders[this._renderType]._fun(this, ctx, x + this._x, y + this._y);
@@ -16002,7 +16037,7 @@ window.Laya= (function (exports) {
         changeText(text) {
             if (this._text !== text) {
                 this.lang(text + "");
-                if (this._graphics && this._graphics.replaceText(this._text)) ;
+                if (this._graphics && this._graphics.replaceText(this._text));
                 else {
                     this.typeset();
                 }
@@ -16794,7 +16829,7 @@ window.Laya= (function (exports) {
             var preDowns;
             preDowns = isLeft ? this.preDowns : this.preRightDowns;
             preO = this.getTouchFromArr(touchID, preDowns);
-            if (!preO) ;
+            if (!preO);
             else {
                 var isDouble;
                 var now = Browser.now();
@@ -16826,7 +16861,7 @@ window.Laya= (function (exports) {
                 Pool.recover("TouchData", preO);
             }
             preO = this.getTouchFromArr(touchID, this.preOvers);
-            if (!preO) ;
+            if (!preO);
             else {
                 if (onMobile) {
                     sendArr = this.getEles(preO.tar, null, sendArr);
@@ -19801,7 +19836,7 @@ window.Laya= (function (exports) {
     Loader.TERRAINHEIGHTDATA = "TERRAINHEIGHTDATA";
     Loader.TERRAINRES = "TERRAIN";
     // TODO ZF 添加 "dds": "image","astc": "image",
-    Loader.typeMap = { "dds": "image","astc": "image","ttf": "ttf", "png": "image", "jpg": "image", "jpeg": "image", "ktx": "image", "pvr": "image", "txt": "text", "json": "json", "prefab": "prefab", "xml": "xml", "als": "atlas", "atlas": "atlas", "mp3": "sound", "ogg": "sound", "wav": "sound", "part": "json", "fnt": "font", "plf": "plf", "plfb": "plfb", "scene": "json", "ani": "json", "sk": "arraybuffer", "wasm": "arraybuffer" };
+    Loader.typeMap = { "dds": "image", "astc": "image", "ttf": "ttf", "png": "image", "jpg": "image", "jpeg": "image", "ktx": "image", "pvr": "image", "txt": "text", "json": "json", "prefab": "prefab", "xml": "xml", "als": "atlas", "atlas": "atlas", "mp3": "sound", "ogg": "sound", "wav": "sound", "part": "json", "fnt": "font", "plf": "plf", "plfb": "plfb", "scene": "json", "ani": "json", "sk": "arraybuffer", "wasm": "arraybuffer" };
     Loader.parserMap = {};
     Loader.maxTimeOut = 100;
     Loader.groupMap = {};
@@ -21625,7 +21660,7 @@ window.Laya= (function (exports) {
         set(key, value) {
             if (key == null)
                 return;
-            if (WeakObject.supportWeakMap) ;
+            if (WeakObject.supportWeakMap);
             else {
                 if (typeof (key) == 'string' || typeof (key) == 'number') {
                     this._obj[key] = value;
@@ -21639,7 +21674,7 @@ window.Laya= (function (exports) {
         get(key) {
             if (key == null)
                 return null;
-            if (WeakObject.supportWeakMap) ;
+            if (WeakObject.supportWeakMap);
             else {
                 if (typeof (key) == 'string' || typeof (key) == 'number')
                     return this._obj[key];
@@ -21649,7 +21684,7 @@ window.Laya= (function (exports) {
         del(key) {
             if (key == null)
                 return;
-            if (WeakObject.supportWeakMap) ;
+            if (WeakObject.supportWeakMap);
             else {
                 if (typeof (key) == 'string' || typeof (key) == 'number')
                     delete this._obj[key];
@@ -22978,15 +23013,15 @@ window.Laya= (function (exports) {
         static __init__() {
             var gl = LayaGL.instance;
             MeshParticle2D._fixattriInfo = [gl.FLOAT, 4, 0,
-                gl.FLOAT, 3, 16,
-                gl.FLOAT, 3, 28,
-                gl.FLOAT, 4, 40,
-                gl.FLOAT, 4, 56,
-                gl.FLOAT, 3, 72,
-                gl.FLOAT, 2, 84,
-                gl.FLOAT, 4, 92,
-                gl.FLOAT, 1, 108,
-                gl.FLOAT, 1, 112];
+            gl.FLOAT, 3, 16,
+            gl.FLOAT, 3, 28,
+            gl.FLOAT, 4, 40,
+            gl.FLOAT, 4, 56,
+            gl.FLOAT, 3, 72,
+            gl.FLOAT, 2, 84,
+            gl.FLOAT, 4, 92,
+            gl.FLOAT, 1, 108,
+            gl.FLOAT, 1, 112];
         }
         setMaxParticleNum(maxNum) {
             this._vb._resizeBuffer(maxNum * 4 * MeshParticle2D.const_stride, false);
@@ -26394,52 +26429,52 @@ window.Laya= (function (exports) {
         }
     }
     ArabicReshaper.charsMap = [[0x0621, 0xFE80, null, null, null],
-        [0x0622, 0xFE81, null, null, 0xFE82],
-        [0x0623, 0xFE83, null, null, 0xFE84],
-        [0x0624, 0xFE85, null, null, 0xFE86],
-        [0x0625, 0xFE87, null, null, 0xFE88],
-        [0x0626, 0xFE89, 0xFE8B, 0xFE8C, 0xFE8A],
-        [0x0627, 0xFE8D, null, null, 0xFE8E],
-        [0x0628, 0xFE8F, 0xFE91, 0xFE92, 0xFE90],
-        [0x0629, 0xFE93, null, null, 0xFE94],
-        [0x062A, 0xFE95, 0xFE97, 0xFE98, 0xFE96],
-        [0x062B, 0xFE99, 0xFE9B, 0xFE9C, 0xFE9A],
-        [0x062C, 0xFE9D, 0xFE9F, 0xFEA0, 0xFE9E],
-        [0x062D, 0xFEA1, 0xFEA3, 0xFEA4, 0xFEA2],
-        [0x062E, 0xFEA5, 0xFEA7, 0xFEA8, 0xFEA6],
-        [0x062F, 0xFEA9, null, null, 0xFEAA],
-        [0x0630, 0xFEAB, null, null, 0xFEAC],
-        [0x0631, 0xFEAD, null, null, 0xFEAE],
-        [0x0632, 0xFEAF, null, null, 0xFEB0],
-        [0x0633, 0xFEB1, 0xFEB3, 0xFEB4, 0xFEB2],
-        [0x0634, 0xFEB5, 0xFEB7, 0xFEB8, 0xFEB6],
-        [0x0635, 0xFEB9, 0xFEBB, 0xFEBC, 0xFEBA],
-        [0x0636, 0xFEBD, 0xFEBF, 0xFEC0, 0xFEBE],
-        [0x0637, 0xFEC1, 0xFEC3, 0xFEC4, 0xFEC2],
-        [0x0638, 0xFEC5, 0xFEC7, 0xFEC8, 0xFEC6],
-        [0x0639, 0xFEC9, 0xFECB, 0xFECC, 0xFECA],
-        [0x063A, 0xFECD, 0xFECF, 0xFED0, 0xFECE],
-        [0x0640, 0x0640, 0x0640, 0x0640, 0x0640],
-        [0x0641, 0xFED1, 0xFED3, 0xFED4, 0xFED2],
-        [0x0642, 0xFED5, 0xFED7, 0xFED8, 0xFED6],
-        [0x0643, 0xFED9, 0xFEDB, 0xFEDC, 0xFEDA],
-        [0x0644, 0xFEDD, 0xFEDF, 0xFEE0, 0xFEDE],
-        [0x0645, 0xFEE1, 0xFEE3, 0xFEE4, 0xFEE2],
-        [0x0646, 0xFEE5, 0xFEE7, 0xFEE8, 0xFEE6],
-        [0x0647, 0xFEE9, 0xFEEB, 0xFEEC, 0xFEEA],
-        [0x0648, 0xFEED, null, null, 0xFEEE],
-        [0x0649, 0xFEEF, null, null, 0xFEF0],
-        [0x064A, 0xFEF1, 0xFEF3, 0xFEF4, 0xFEF2],
-        [0x067E, 0xFB56, 0xFB58, 0xFB59, 0xFB57],
-        [0x06CC, 0xFBFC, 0xFBFE, 0xFBFF, 0xFBFD],
-        [0x0686, 0xFB7A, 0xFB7C, 0xFB7D, 0xFB7B],
-        [0x06A9, 0xFB8E, 0xFB90, 0xFB91, 0xFB8F],
-        [0x06AF, 0xFB92, 0xFB94, 0xFB95, 0xFB93],
-        [0x0698, 0xFB8A, null, null, 0xFB8B]];
+    [0x0622, 0xFE81, null, null, 0xFE82],
+    [0x0623, 0xFE83, null, null, 0xFE84],
+    [0x0624, 0xFE85, null, null, 0xFE86],
+    [0x0625, 0xFE87, null, null, 0xFE88],
+    [0x0626, 0xFE89, 0xFE8B, 0xFE8C, 0xFE8A],
+    [0x0627, 0xFE8D, null, null, 0xFE8E],
+    [0x0628, 0xFE8F, 0xFE91, 0xFE92, 0xFE90],
+    [0x0629, 0xFE93, null, null, 0xFE94],
+    [0x062A, 0xFE95, 0xFE97, 0xFE98, 0xFE96],
+    [0x062B, 0xFE99, 0xFE9B, 0xFE9C, 0xFE9A],
+    [0x062C, 0xFE9D, 0xFE9F, 0xFEA0, 0xFE9E],
+    [0x062D, 0xFEA1, 0xFEA3, 0xFEA4, 0xFEA2],
+    [0x062E, 0xFEA5, 0xFEA7, 0xFEA8, 0xFEA6],
+    [0x062F, 0xFEA9, null, null, 0xFEAA],
+    [0x0630, 0xFEAB, null, null, 0xFEAC],
+    [0x0631, 0xFEAD, null, null, 0xFEAE],
+    [0x0632, 0xFEAF, null, null, 0xFEB0],
+    [0x0633, 0xFEB1, 0xFEB3, 0xFEB4, 0xFEB2],
+    [0x0634, 0xFEB5, 0xFEB7, 0xFEB8, 0xFEB6],
+    [0x0635, 0xFEB9, 0xFEBB, 0xFEBC, 0xFEBA],
+    [0x0636, 0xFEBD, 0xFEBF, 0xFEC0, 0xFEBE],
+    [0x0637, 0xFEC1, 0xFEC3, 0xFEC4, 0xFEC2],
+    [0x0638, 0xFEC5, 0xFEC7, 0xFEC8, 0xFEC6],
+    [0x0639, 0xFEC9, 0xFECB, 0xFECC, 0xFECA],
+    [0x063A, 0xFECD, 0xFECF, 0xFED0, 0xFECE],
+    [0x0640, 0x0640, 0x0640, 0x0640, 0x0640],
+    [0x0641, 0xFED1, 0xFED3, 0xFED4, 0xFED2],
+    [0x0642, 0xFED5, 0xFED7, 0xFED8, 0xFED6],
+    [0x0643, 0xFED9, 0xFEDB, 0xFEDC, 0xFEDA],
+    [0x0644, 0xFEDD, 0xFEDF, 0xFEE0, 0xFEDE],
+    [0x0645, 0xFEE1, 0xFEE3, 0xFEE4, 0xFEE2],
+    [0x0646, 0xFEE5, 0xFEE7, 0xFEE8, 0xFEE6],
+    [0x0647, 0xFEE9, 0xFEEB, 0xFEEC, 0xFEEA],
+    [0x0648, 0xFEED, null, null, 0xFEEE],
+    [0x0649, 0xFEEF, null, null, 0xFEF0],
+    [0x064A, 0xFEF1, 0xFEF3, 0xFEF4, 0xFEF2],
+    [0x067E, 0xFB56, 0xFB58, 0xFB59, 0xFB57],
+    [0x06CC, 0xFBFC, 0xFBFE, 0xFBFF, 0xFBFD],
+    [0x0686, 0xFB7A, 0xFB7C, 0xFB7D, 0xFB7B],
+    [0x06A9, 0xFB8E, 0xFB90, 0xFB91, 0xFB8F],
+    [0x06AF, 0xFB92, 0xFB94, 0xFB95, 0xFB93],
+    [0x0698, 0xFB8A, null, null, 0xFB8B]];
     ArabicReshaper.combCharsMap = [[[0x0644, 0x0622], 0xFEF5, null, null, 0xFEF6],
-        [[0x0644, 0x0623], 0xFEF7, null, null, 0xFEF8],
-        [[0x0644, 0x0625], 0xFEF9, null, null, 0xFEFA],
-        [[0x0644, 0x0627], 0xFEFB, null, null, 0xFEFC]];
+    [[0x0644, 0x0623], 0xFEF7, null, null, 0xFEF8],
+    [[0x0644, 0x0625], 0xFEF9, null, null, 0xFEFA],
+    [[0x0644, 0x0627], 0xFEFB, null, null, 0xFEFC]];
     ArabicReshaper.transChars = [0x0610,
         0x0612,
         0x0613,
@@ -26513,65 +26548,59 @@ window.Laya= (function (exports) {
         }
     }
 
-    
+
     // TODO ZF 读取astc format
-    class ZF_ASTC
-    {
-        static GetFormats(blockX, blockY, blockZ = 1, isAlpha = false)
-        {
+    class ZF_ASTC {
+        static GetFormats(blockX, blockY, blockZ = 1, isAlpha = false) {
             this.InitFormats();
-            for(let item of this.FORMATS )
-            {
-                if(item[0] == blockX && item[1] == blockY && item[2] == blockZ && item[3] == isAlpha)
-                {
+            for (let item of this.FORMATS) {
+                if (item[0] == blockX && item[1] == blockY && item[2] == blockZ && item[3] == isAlpha) {
                     return item[4];
                 }
             }
             return LayaGL.layaGPUInstance._compressedTextureASTC.COMPRESSED_RGBA_ASTC_12x12_KHR;
         }
 
-        static InitFormats()
-        {
-            if(this.FORMATS == null)
-            {
+        static InitFormats() {
+            if (this.FORMATS == null) {
                 var GLTC = LayaGL.layaGPUInstance._compressedTextureASTC;
-                this.FORMATS =[
+                this.FORMATS = [
                     // 2D Linear RGB
-                    [ 4,  4,  1, false, GLTC.COMPRESSED_RGBA_ASTC_4x4_KHR],
-                    [ 5,  4,  1, false, GLTC.COMPRESSED_RGBA_ASTC_5x4_KHR],
-                    [ 5,  5,  1, false, GLTC.COMPRESSED_RGBA_ASTC_5x5_KHR],
-                    [ 6,  5,  1, false, GLTC.COMPRESSED_RGBA_ASTC_6x5_KHR],
-                    [ 6,  6,  1, false, GLTC.COMPRESSED_RGBA_ASTC_6x6_KHR],
-                    [ 8,  5,  1, false, GLTC.COMPRESSED_RGBA_ASTC_8x5_KHR],
-                    [ 8,  6,  1, false, GLTC.COMPRESSED_RGBA_ASTC_8x6_KHR],
-                    [ 8,  8,  1, false, GLTC.COMPRESSED_RGBA_ASTC_8x8_KHR],
-                    [10,  5,  1, false, GLTC.COMPRESSED_RGBA_ASTC_10x5_KHR],
-                    [10,  6,  1, false, GLTC.COMPRESSED_RGBA_ASTC_10x6_KHR],
-                    [10,  8,  1, false, GLTC.COMPRESSED_RGBA_ASTC_10x8_KHR],
-                    [10, 10,  1, false, GLTC.COMPRESSED_RGBA_ASTC_10x10_KHR],
-                    [12, 10,  1, false, GLTC.COMPRESSED_RGBA_ASTC_12x10_KHR],
-                    [12, 12,  1, false, GLTC.COMPRESSED_RGBA_ASTC_12x12_KHR],
+                    [4, 4, 1, false, GLTC.COMPRESSED_RGBA_ASTC_4x4_KHR],
+                    [5, 4, 1, false, GLTC.COMPRESSED_RGBA_ASTC_5x4_KHR],
+                    [5, 5, 1, false, GLTC.COMPRESSED_RGBA_ASTC_5x5_KHR],
+                    [6, 5, 1, false, GLTC.COMPRESSED_RGBA_ASTC_6x5_KHR],
+                    [6, 6, 1, false, GLTC.COMPRESSED_RGBA_ASTC_6x6_KHR],
+                    [8, 5, 1, false, GLTC.COMPRESSED_RGBA_ASTC_8x5_KHR],
+                    [8, 6, 1, false, GLTC.COMPRESSED_RGBA_ASTC_8x6_KHR],
+                    [8, 8, 1, false, GLTC.COMPRESSED_RGBA_ASTC_8x8_KHR],
+                    [10, 5, 1, false, GLTC.COMPRESSED_RGBA_ASTC_10x5_KHR],
+                    [10, 6, 1, false, GLTC.COMPRESSED_RGBA_ASTC_10x6_KHR],
+                    [10, 8, 1, false, GLTC.COMPRESSED_RGBA_ASTC_10x8_KHR],
+                    [10, 10, 1, false, GLTC.COMPRESSED_RGBA_ASTC_10x10_KHR],
+                    [12, 10, 1, false, GLTC.COMPRESSED_RGBA_ASTC_12x10_KHR],
+                    [12, 12, 1, false, GLTC.COMPRESSED_RGBA_ASTC_12x12_KHR],
                     // 2D SRGB
-                    [ 4,  4,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR],
-                    [ 5,  4,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR],
-                    [ 5,  5,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR],
-                    [ 6,  5,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR],
-                    [ 6,  6,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR],
-                    [ 8,  5,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR],
-                    [ 8,  6,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR],
-                    [ 8,  8,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR],
-                    [10,  5,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR],
-                    [10,  6,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR],
-                    [10,  8,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR],
-                    [10, 10,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR],
-                    [12, 10,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR],
-                    [12, 12,  1,  true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR]
+                    [4, 4, 1, true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR],
+                    [5, 4, 1, true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR],
+                    [5, 5, 1, true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR],
+                    [6, 5, 1, true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR],
+                    [6, 6, 1, true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR],
+                    [8, 5, 1, true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR],
+                    [8, 6, 1, true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR],
+                    [8, 8, 1, true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR],
+                    [10, 5, 1, true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR],
+                    [10, 6, 1, true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR],
+                    [10, 8, 1, true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR],
+                    [10, 10, 1, true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR],
+                    [12, 10, 1, true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR],
+                    [12, 12, 1, true, GLTC.COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR]
                 ]
 
             }
         }
     }
-    ZF_ASTC.FORMATS= null;
+    ZF_ASTC.FORMATS = null;
 
     exports.ZF_ASTC = ZF_ASTC;
 
@@ -26797,7 +26826,7 @@ window.Laya= (function (exports) {
     exports.isWXPosMsg = isWXPosMsg;
     exports.version = version;
 
-    exports.static=_static;
+    exports.static = _static;
 
     return exports;
 

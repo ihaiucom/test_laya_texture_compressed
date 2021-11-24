@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="jor1ejw3">
+  <resources>
+    <image id="f7t80" name="按钮_返回.png" path="/"/>
+    <component id="f7t81" name="Btn.xml" path="/" exported="true"/>
+    <component id="f7t83" name="ScenarioSkipBtn.xml" path="/" exported="true"/>
+    <image id="f7t84" name="跳过.png" path="/"/>
+    <component id="f7t85" name="Test5Panel.xml" path="/" exported="true"/>
+  </resources>
+  <publish name="" genCode="true"/>
+</packageDescription>

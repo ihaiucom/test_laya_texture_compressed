@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="970,601">
+  <displayList>
+    <image id="n0_f7t8" name="bg" src="f7t8d" fileName="大弹出_底图.png" xy="0,0"/>
+    <component id="n1_f7t8" name="btnBlue" src="f7t81" fileName="ButtonABlue.xml" xy="93,154"/>
+    <component id="n2_f7t8" name="btnYellow" src="f7t82" fileName="ButtonAYellow.xml" xy="101,320"/>
+    <component id="n3_f7t8" name="btnBack" src="f7t83" fileName="ButtonBack.xml" xy="102,39"/>
+  </displayList>
+</component>

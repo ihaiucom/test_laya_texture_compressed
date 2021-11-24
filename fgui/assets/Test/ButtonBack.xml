@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="58,58" pivot="0.5,0.5" extention="Button">
+  <controller name="button" pages="0,up,1,down" selected="0"/>
+  <displayList>
+    <loader id="n0_dogm" name="_iconBack" xy="0,0" size="58,58" url="ui://jchavkemf7t8c"/>
+  </displayList>
+  <Button downEffect="dark" downEffectValue=".8"/>
+</component>

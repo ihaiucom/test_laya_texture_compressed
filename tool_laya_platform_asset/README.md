@@ -26,3 +26,14 @@ ts-node ./src/index.ts compressed dds -i ./test2/platform_asset/default_high -o 
 ts-node ./src/index.ts compressed dds -i ./test2/platform_asset/default_middle -o ./test2/platform_asset/dds_middle -c 'dxt5'
 ts-node ./src/index.ts compressed dds -i ./test2/platform_asset/default_low -o ./test2/platform_asset/dds_low -c 'dxt5'
 ts-node ./src/index.ts copyproject -l ../Laya212 -t ./test2/platform_asset  -o ./test2/platform_package/pc_low  -p pc_low
+
+
+ts-node ./src/index.ts copyimage -i D:\zengfeng\GameJJSG2021\client\laya\bin -o ./test3/platform_asset/default_high
+ts-node ./src/index.ts resize -s '50%' -q 70 -i ./test3/platform_asset/default_high -o ./test3/platform_asset/default_middle
+ts-node ./src/index.ts resize -s '25%' -q 70 -i ./test3/platform_asset/default_high -o ./test3/platform_asset/default_low
+ts-node ./src/index.ts compressed dds -i ./test3/platform_asset/default_high -o ./test3/platform_asset/dds_high -c 'dxt5'
+ts-node ./src/index.ts compressed dds -i ./test3/platform_asset/default_middle -o ./test3/platform_asset/dds_middle -c 'dxt5'
+ts-node ./src/index.ts compressed dds -i ./test3/platform_asset/default_low -o ./test3/platform_asset/dds_low -c 'dxt5'
+ts-node ./src/index.ts copyproject -l D:\zengfeng\GameJJSG2021\client\laya -t ./test3/platform_asset  -o ./test3/platform_package/pc_low  -p pc_low
+ts-node ./src/index.ts compressed pvr -i ./test3/platform_asset/default_high -o ./test3/platform_asset/pvr_high -f 'PVRTC1_2' -q 'pvrtcfast' -p '-' -s '-'
+ts-node ./src/index.ts compressed etc -i ./test3/platform_asset/default_high -o ./test3/platform_asset/etc_high -f 'etc2_rgba' -s 'fast'

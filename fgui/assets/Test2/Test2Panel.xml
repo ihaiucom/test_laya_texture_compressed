@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="800,600">
+  <displayList>
+    <loader id="n3_f7t8" name="bg1" xy="215,188" size="225,69" url="ui://jltl6uwwf7t82" fill="scaleFree"/>
+    <image id="n7_f7t8" name="n7" src="f7t85" fileName="公共_特殊黄按钮(1).png" xy="198,351"/>
+    <loader id="n9_f7t8" name="n9" xy="473,344" size="281,69" url="ui://jltl6uwwf7t85" fill="scaleFree"/>
+    <image id="n10_f7t8" name="n10" src="f7t85" fileName="公共_特殊黄按钮(1).png" xy="203,465" size="350,69"/>
+    <loader id="n11_f7t8" name="bg2" xy="477,188" size="307,69" url="ui://jltl6uwwf7t82" fill="scaleFree"/>
+    <image id="n12_f7t8" name="n12" src="f7t86" fileName="公共_特殊黄按钮 - 副本.png" xy="192,562" size="225,69"/>
+    <image id="n13_f7t8" name="n13" src="f7t86" fileName="公共_特殊黄按钮 - 副本.png" xy="461,565" size="251,35" scale="2,2"/>
+    <image id="n14_f7t8" name="n14" src="f7t86" fileName="公共_特殊黄按钮 - 副本.png" xy="196,658" size="249,35"/>
+  </displayList>
+</component>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="jchavkem">
+  <resources>
+    <component id="u9i50" name="TestPanel.xml" path="/" exported="true"/>
+    <component id="f7t81" name="ButtonABlue.xml" path="/"/>
+    <component id="f7t82" name="ButtonAYellow.xml" path="/"/>
+    <component id="f7t83" name="ButtonBack.xml" path="/"/>
+    <image id="f7t85" name="siyuan_white_system_30_2.png" path="/"/>
+    <font id="f7t84" name="siyuan_white_system_30_2.fnt" path="/" exported="true" texture="f7t85"/>
+    <image id="f7t86" name="公共_特殊灰按钮+花纹.png" path="/"/>
+    <image id="f7t87" name="公共_特殊灰按钮.png" path="/"/>
+    <image id="f7t88" name="公共_特殊蓝按钮+花纹.png" path="/"/>
+    <image id="f7t89" name="公共_特殊蓝按钮.png" path="/"/>
+    <image id="f7t8a" name="公共_特殊黄按钮+花纹.png" path="/"/>
+    <image id="f7t8b" name="公共_特殊黄按钮.png" path="/"/>
+    <image id="f7t8c" name="按钮_返回.png" path="/"/>
+    <image id="f7t8d" name="大弹出_底图.png" path="/"/>
+  </resources>
+  <publish name="Test" genCode="true"/>
+</packageDescription>

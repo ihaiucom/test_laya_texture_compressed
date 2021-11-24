@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="800,600">
+  <displayList>
+    <text id="n0_f7t8" name="title11" xy="344,170" size="138,98" font="ui://j09v5djqf7t81" fontSize="30" leading="19" letterSpacing="30" autoSize="none" text="开始&#xA;游戏"/>
+    <text id="n2_f7t8" name="title2" xy="168,306" size="125,89" font="ui://j09v5djqf7t84" fontSize="30" color="#ffffff" autoSize="none" text="开始&#xA;游戏"/>
+    <text id="n3_f7t8" name="title1" xy="164,166" size="125,89" font="ui://j09v5djqf7t81" fontSize="30" autoSize="none" text="开始&#xA;游戏"/>
+    <text id="n4_f7t8" name="title2" xy="168,426" size="162,147" font="ui://j09v5djqf7t84" fontSize="60" color="#ffffff" autoSize="none" text="开始&#xA;游戏"/>
+  </displayList>
+</component>

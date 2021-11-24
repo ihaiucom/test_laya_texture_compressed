@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="jltl6uww">
+  <resources>
+    <component id="f7t80" name="Test2Panel.xml" path="/" exported="true"/>
+    <image id="f7t81" name="大弹出_底图.png" path="/" exported="true"/>
+    <image id="f7t82" name="公共_特殊黄按钮.png" path="/" exported="true" scale9grid="56,17,112,34"/>
+    <image id="f7t85" name="公共_特殊黄按钮(1).png" path="/" exported="true" scale="9grid" scale9grid="56,17,112,34"/>
+    <image id="f7t86" name="公共_特殊黄按钮 - 副本.png" path="/" scale="9grid" scale9grid="28,8,56,16"/>
+  </resources>
+  <publish name="" genCode="true"/>
+</packageDescription>

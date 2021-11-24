@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1334,750">
+  <displayList>
+    <component id="n0_f7t8" name="btn" src="f7t83" fileName="ScenarioSkipBtn.xml" xy="302,196"/>
+  </displayList>
+</component>

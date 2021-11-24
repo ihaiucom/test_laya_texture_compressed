@@ -1,3 +1,9 @@
+import TestBinder from "./fgui/Test/TestBinder";
+import UI_TestPanel from "./fgui/Test/UI_TestPanel";
+import UI_Test2Panel from "./fgui/Test2/UI_Test2Panel";
+import UI_Test3Panel from "./fgui/Test3/UI_Test3Panel";
+import UI_Test4Panel from "./fgui/Test4/UI_Test4Panel";
+import UI_Test5Panel from "./fgui/Test5/UI_Test5Panel";
 import GameConfig from "./GameConfig";
 import { EnumGameAssetFolder } from "./GameLayaExtend/EnumGameAssetFolder";
 import { GameLayaExtend } from "./GameLayaExtend/GameLayaExtend";
@@ -91,6 +97,9 @@ class Main {
 		// Laya.ResourceVersion.enable("version.json", Laya.Handler.create(this, this.onVersionLoaded), Laya.ResourceVersion.FILENAME_VERSION);
 
 		GameLayaExtend.Init();
+		// 设置fgui文件后缀
+		fgui.UIConfig.packageFileExtension = "bin";
+		TestBinder.bindAll();
 
 		// GameLayaExtend.AssetFolder = EnumGameAssetFolder.dds_high;
 		// GameLayaExtend.AssetFolder = EnumGameAssetFolder.dds_middle;
@@ -102,27 +111,39 @@ class Main {
 		// GameLayaExtend.AssetFolder = EnumGameAssetFolder.pvr_high;
 		// if (!window['wx']) alert(GameLayaExtend.AssetFolder)
 		// GameLayaURL.SetBasePath("http://192.168.15.39:8901/asset_platform", GameLayaExtend.AssetFolder);
+
+		// 根容器
+		Laya.stage.addChild(fgui.GRoot.inst.displayObject);
 		GameLayaURL.LoadExtReplaceConfig(Laya.Handler.create(null, () => {
 			GameLayaURL.InitCustomFormat();
+
+
+			fgui.UIPackage.loadPackage("fgui/Test5", Laya.Handler.create(this, () => {
+				var testPanel = UI_Test5Panel.createInstance();
+				fgui.GRoot.inst.addChild(testPanel);
+			}));
+
+			// sp.loadImage("6_512x256.png");
 
 			// Laya.loader.load("6.png", Laya.Handler.create(null, (tex: Laya.Texture2D) => {
 			// 	material.albedoTexture = tex;
 			// }));
 
 
-			Laya.loader.create("res3d/Conventional/Quad.lh", Laya.Handler.create(null, (sprite3D: Laya.Sprite3D) => {
-				window['sprite3D'] = sprite3D;
-				sprite3D.transform.localRotationEulerY = 180;
-				// this.scene.RotationTarget(sprite3D);
-				this.scene.addChild(sprite3D);
-			}))
+			// Laya.loader.create("res3d/Conventional/Quad.lh", Laya.Handler.create(null, (sprite3D: Laya.Sprite3D) => {
+			// 	window['sprite3D'] = sprite3D;
+			// 	sprite3D.transform.localRotationEulerY = 180;
+			// 	// this.scene.RotationTarget(sprite3D);
+			// 	this.scene.addChild(sprite3D);
+			// }))
+
+
 		}));
 
 
 		// this.scene.RotationTarget(box);
 
 
-		// sp.loadImage("http://192.168.15.39:8901/bin/6.png");
 
 
 		window['renderNum'] = 0;

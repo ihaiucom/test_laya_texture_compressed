@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="jwm9ghs9">
+  <resources>
+    <movieclip id="f7t80" name="ResFx_ui_bg_yanxulie.jta" path="/" exported="true"/>
+    <image id="f7t81" name="线条_00.png" path="/"/>
+    <image id="f7t82" name="线条_01.png" path="/"/>
+    <image id="f7t83" name="线条_02.png" path="/"/>
+    <image id="f7t84" name="线条_03.png" path="/"/>
+    <image id="f7t85" name="线条_04.png" path="/"/>
+    <image id="f7t86" name="线条_05.png" path="/"/>
+    <image id="f7t87" name="线条_06.png" path="/"/>
+    <image id="f7t88" name="线条_07.png" path="/"/>
+    <image id="f7t89" name="线条_08.png" path="/"/>
+    <image id="f7t8a" name="线条_09.png" path="/"/>
+    <image id="f7t8b" name="线条_10.png" path="/"/>
+    <image id="f7t8c" name="线条_11.png" path="/"/>
+    <component id="f7t8d" name="Test4Panel.xml" path="/" exported="true"/>
+  </resources>
+  <publish name="" genCode="true"/>
+</packageDescription>

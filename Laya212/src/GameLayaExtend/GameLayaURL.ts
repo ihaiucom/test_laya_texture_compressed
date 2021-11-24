@@ -4,7 +4,7 @@ import { EnumGameAssetFolder } from "./EnumGameAssetFolder";
 export class GameLayaURL {
 
     /** 格式替换 */
-    static ext_replace: { [key: string]: string };
+    static ext_replace: { [key: string]: string } = {};
 
     static SetBasePath(basePath: string, folder: EnumGameAssetFolder) {
         Laya.URL.basePath = basePath + "/" + folder + "/";
@@ -23,8 +23,9 @@ export class GameLayaURL {
     /** 加载 ext_replace.json */
     static LoadExtReplaceConfig(complete: Handler) {
         Laya.loader.load("asset_url_replace.json", Laya.Handler.create(null, (json) => {
-            console.log(json);
-            this.ext_replace = json;
+            if (json != null) {
+                this.ext_replace = json;
+            }
             complete && complete.run();
         }), null, Laya.Loader.JSON)
     }

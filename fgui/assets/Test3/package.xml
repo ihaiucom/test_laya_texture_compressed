@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="j09v5djq">
+  <resources>
+    <image id="f7t80" name="siyuan_white_system_30.png" path="/" atlas="1"/>
+    <font id="f7t81" name="siyuan_white_system_30.fnt" path="/" exported="true" texture="f7t80"/>
+    <component id="f7t82" name="Test3Panel.xml" path="/" exported="true"/>
+    <image id="f7t83" name="siyuan_white_system_30_2.png" path="/" atlas="2"/>
+    <font id="f7t84" name="siyuan_white_system_30_2.fnt" path="/" exported="true" texture="f7t83"/>
+  </resources>
+  <publish name="" genCode="true"/>
+</packageDescription>
