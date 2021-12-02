@@ -7836,7 +7836,6 @@ window.Laya = (function (exports) {
                         break;
                 }
 
-                console.log("Texture.load", url);
                 ILaya.loader.load(url, Handler.create(this, this._onLoaded, [complete]), null, type, 1, true);
             }
         }
