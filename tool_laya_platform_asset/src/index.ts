@@ -13,6 +13,7 @@ commander
     .version('1.0.0', '-v, --version')
     .usage("[command] [args]")
     .command('copyimage', '拷贝图片.')
+    .command('copyimagefromunity', '拷贝图片从unity拷贝.')
     .command('resize', '缩放图片.')
     .command('compressed', '压缩图片.')
     .command('copyproject', '拷贝laya工程.')

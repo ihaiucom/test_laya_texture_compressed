@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="800,600">
+  <displayList>
+    <component id="n0_jqfk" name="png_add" src="jqfk0" fileName="Button.xml" xy="84,78" size="190,64">
+      <Button title="Add"/>
+    </component>
+    <component id="n1_jqfk" name="png_remove" src="jqfk0" fileName="Button.xml" xy="88,197" size="190,64">
+      <Button title="Remove"/>
+    </component>
+    <text id="n2_jqfk" name="n2" xy="144,6" size="61,43" fontSize="31" color="#cccccc" text="png"/>
+    <component id="n3_jqfk" name="astc_add" src="jqfk0" fileName="Button.xml" xy="355,76" size="190,64">
+      <Button title="Add"/>
+    </component>
+    <component id="n4_jqfk" name="astc_remove" src="jqfk0" fileName="Button.xml" xy="359,195" size="190,64">
+      <Button title="Remove"/>
+    </component>
+    <text id="n5_jqfk" name="n5" xy="415,5" size="65,43" fontSize="31" color="#cccccc" text="astc"/>
+    <component id="n6_jqfk" name="png_removeall" src="jqfk0" fileName="Button.xml" xy="89,416" size="190,64">
+      <Button title="RemoveAll"/>
+    </component>
+    <component id="n7_jqfk" name="astc_removeall" src="jqfk0" fileName="Button.xml" xy="357,420" size="190,64">
+      <Button title="RemoveAll"/>
+    </component>
+    <component id="n8_jqfk" name="png_addall" src="jqfk0" fileName="Button.xml" xy="88,315" size="190,64">
+      <Button title="AddAll"/>
+    </component>
+    <component id="n9_jqfk" name="astc_addall" src="jqfk0" fileName="Button.xml" xy="354,316" size="190,64">
+      <Button title="AddAll"/>
+    </component>
+    <component id="n10_jqfk" name="ktx_add" src="jqfk0" fileName="Button.xml" xy="568,75" size="190,64">
+      <Button title="Add"/>
+    </component>
+    <component id="n11_jqfk" name="ktx_remove" src="jqfk0" fileName="Button.xml" xy="572,194" size="190,64">
+      <Button title="Remove"/>
+    </component>
+    <text id="n12_jqfk" name="n12" xy="628,4" size="50,43" fontSize="31" color="#cccccc" text="ktx"/>
+    <component id="n13_jqfk" name="ktx_removeall" src="jqfk0" fileName="Button.xml" xy="570,419" size="190,64">
+      <Button title="RemoveAll"/>
+    </component>
+    <component id="n14_jqfk" name="ktx_addall" src="jqfk0" fileName="Button.xml" xy="567,315" size="190,64">
+      <Button title="AddAll"/>
+    </component>
+    <component id="n15_jqfk" name="ktx1_add" src="jqfk0" fileName="Button.xml" xy="800,70" size="190,64">
+      <Button title="Add"/>
+    </component>
+    <component id="n16_jqfk" name="ktx1_remove" src="jqfk0" fileName="Button.xml" xy="804,189" size="190,64">
+      <Button title="Remove"/>
+    </component>
+    <text id="n17_jqfk" name="n17" xy="860,-1" size="68,43" fontSize="31" color="#cccccc" text="ktx1"/>
+    <component id="n18_jqfk" name="ktx1_removeall" src="jqfk0" fileName="Button.xml" xy="802,414" size="190,64">
+      <Button title="RemoveAll"/>
+    </component>
+    <component id="n19_jqfk" name="ktx1_addall" src="jqfk0" fileName="Button.xml" xy="799,310" size="190,64">
+      <Button title="AddAll"/>
+    </component>
+    <component id="n20_jqfk" name="ktxr_add" src="jqfk0" fileName="Button.xml" xy="1034,73" size="190,64">
+      <Button title="Add"/>
+    </component>
+    <component id="n21_jqfk" name="ktxr_remove" src="jqfk0" fileName="Button.xml" xy="1038,192" size="190,64">
+      <Button title="Remove"/>
+    </component>
+    <text id="n22_jqfk" name="n22" xy="1094,2" size="63,43" fontSize="31" color="#cccccc" text="ktxr"/>
+    <component id="n23_jqfk" name="ktxr_removeall" src="jqfk0" fileName="Button.xml" xy="1036,417" size="190,64">
+      <Button title="RemoveAll"/>
+    </component>
+    <component id="n24_jqfk" name="ktxr_addall" src="jqfk0" fileName="Button.xml" xy="1033,313" size="190,64">
+      <Button title="AddAll"/>
+    </component>
+    <component id="n25_jqfk" name="dds_add" src="jqfk0" fileName="Button.xml" xy="1278,74" size="190,64">
+      <Button title="Add"/>
+    </component>
+    <component id="n26_jqfk" name="dds_remove" src="jqfk0" fileName="Button.xml" xy="1282,193" size="190,64">
+      <Button title="Remove"/>
+    </component>
+    <text id="n27_jqfk" name="n27" xy="1338,3" size="59,43" fontSize="31" color="#cccccc" text="dds"/>
+    <component id="n28_jqfk" name="dds_removeall" src="jqfk0" fileName="Button.xml" xy="1280,418" size="190,64">
+      <Button title="RemoveAll"/>
+    </component>
+    <component id="n29_jqfk" name="dds_addall" src="jqfk0" fileName="Button.xml" xy="1277,314" size="190,64">
+      <Button title="AddAll"/>
+    </component>
+  </displayList>
+</component>

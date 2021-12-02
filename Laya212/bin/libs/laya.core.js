@@ -7836,6 +7836,7 @@ window.Laya = (function (exports) {
                         break;
                 }
 
+                console.log("Texture.load", url);
                 ILaya.loader.load(url, Handler.create(this, this._onLoaded, [complete]), null, type, 1, true);
             }
         }
@@ -19260,7 +19261,11 @@ window.Laya = (function (exports) {
             var cacheRes;
             if (type == Loader.IMAGE) {
                 cacheRes = Loader.textureMap[url];
-                if (cacheRes && cacheRes.bitmap && cacheRes.bitmap.destroyed) {
+                // TODO ZF 加载贴图时，贴图先缓存了实际没加载情况
+                if (cacheRes && !cacheRes.bitmap) {
+                    cacheRes = null;
+                }
+                else if (cacheRes && cacheRes.bitmap && cacheRes.bitmap.destroyed) {
                     cacheRes = null;
                 }
             }
@@ -19993,6 +19998,10 @@ window.Laya = (function (exports) {
             else
                 content = Loader.loadedMap[URL.formatURL(url)];
             if (!ignoreCache && content != null) {
+                // TODO ZF 加载贴图时，用缓存但实际没加载
+                if (!content.bitmap) {
+                    console.error("用缓存但实际没加载", url, content);
+                }
                 ILaya.systemTimer.callLater(this, function () {
                     progress && progress.runWith(1);
                     complete && complete.runWith(content instanceof Array ? [content] : content);
