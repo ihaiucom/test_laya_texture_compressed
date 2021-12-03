@@ -132,7 +132,7 @@
 	        var sprite = this.arr[this.index - 1];
 	        delete this.arr[this.index - 1];
 	        var url = sprite['url'];
-	        sprite.removeSelf();
+	        sprite.destroy();
 	        Laya.loader.clearRes(url);
 	        Laya.Resource.destroyUnusedResources();
 	        this.index--;
