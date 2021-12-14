@@ -17,6 +17,7 @@ commander
     .command('resize', '缩放图片.')
     .command('compressed', '压缩图片.')
     .command('copyproject', '拷贝laya工程.')
+    .command('imagesize', '输出图片大小.')
     .parse(process.argv);
 
 const cmd = `

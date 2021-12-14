@@ -1,9 +1,5 @@
-import { argv } from "process";
-import fs from "fs";
 import path from "path";
 import { FileUtils } from "./FileUtils";
-import { stringify } from "querystring";
-import { EnumExt } from "./EnumExt";
 import { FileCopyUtils } from "./FileCopyUtils";
 import { ImageFile } from "./ImageCompressedUtils";
 

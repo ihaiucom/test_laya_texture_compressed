@@ -358,8 +358,8 @@
                 Laya.enableDebugPanel();
             if (GameConfig.physicsDebug && Laya["PhysicsDebugDraw"])
                 Laya["PhysicsDebugDraw"].enable();
-            if (GameConfig.stat)
-                Laya.Stat.show();
+            // if (GameConfig.stat)
+            //     Laya.Stat.show();
             Laya.alertGlobalError(true);
             this.scene = TestScene.create();
             Laya.stage.addChild(this.scene);
@@ -386,6 +386,55 @@
                     }
                 }
             }
+
+            var arr = [
+                "MAX_3D_TEXTURE_SIZE"
+,"MAX_ELEMENTS_VERTICES"
+,"MAX_ELEMENTS_INDICES"
+,"MAX_TEXTURE_LOD_BIAS"
+,"MAX_FRAGMENT_UNIFORM_COMPONENTS"
+,"MAX_VERTEX_UNIFORM_COMPONENTS"
+,"MAX_ARRAY_TEXTURE_LAYERS"
+,"MIN_PROGRAM_TEXEL_OFFSET"
+,"MAX_PROGRAM_TEXEL_OFFSET"
+,"MAX_VARYING_COMPONENTS"
+,"MAX_VERTEX_OUTPUT_COMPONENTS"
+,"MAX_FRAGMENT_INPUT_COMPONENTS"
+,"MAX_SERVER_WAIT_TIMEOUT"
+,"MAX_ELEMENT_INDEX"
+,"MAX_SAMPLES"
+,"MAX_VERTEX_UNIFORM_BLOCKS"
+,"MAX_FRAGMENT_UNIFORM_BLOCKS"
+,"MAX_COMBINED_UNIFORM_BLOCKS"
+,"MAX_UNIFORM_BUFFER_BINDINGS"
+,"MAX_UNIFORM_BLOCK_SIZE"
+,"MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS"
+,"MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS"
+,"MAX_VERTEX_ATTRIBS"
+,"MAX_VERTEX_UNIFORM_VECTORS"
+,"MAX_COMBINED_TEXTURE_IMAGE_UNITS"
+,"MAX_VERTEX_TEXTURE_IMAGE_UNITS"
+,"MAX_TEXTURE_IMAGE_UNITS"
+,"MAX_FRAGMENT_UNIFORM_VECTORS"
+,"MAX_VARYING_VECTORS"
+            ]
+
+            str = "";
+            // var v = gl.getParameter(gl.MAX_VARYING_VECTORS)
+            // console.log("MAX_VARYING_VECTORS=" + v);
+            // str += "MAX_VARYING_VECTORS=" + v + "\n";
+
+            for(var k of arr)
+            {
+
+                var v = gl.getParameter(gl[k])
+                console.log(k + "=" + v);
+                str += k + "=" + v+ "\n";
+            }
+
+            
+			str += "R16G16B16A16" + (Laya.SystemUtils.supportTextureFormat(Laya.TextureFormat.R16G16B16A16)) + "\n"
+
             var sp = new Laya.Sprite();
             sp.name = "ZFSprite";
             window['sp'] = sp;
@@ -398,17 +447,17 @@
             txt.y = 20;
             txt.color = "#ff0000";
             Laya.stage.addChild(txt);
-            GameLayaExtend.Init();
-            if (!window['wx'])
-                alert(GameLayaExtend.AssetFolder);
-            GameLayaURL.SetBasePath("http://192.168.15.39:8901/asset_platform", GameLayaExtend.AssetFolder);
-            GameLayaURL.LoadExtReplaceConfig(Laya.Handler.create(null, () => {
-                GameLayaURL.InitCustomFormat();
-                Laya.loader.load("6.png", Laya.Handler.create(null, (tex) => {
-                    material.albedoTexture = tex;
-                }));
-            }));
-            window['renderNum'] = 0;
+            // GameLayaExtend.Init();
+            // if (!window['wx'])
+            //     alert(GameLayaExtend.AssetFolder);
+            // GameLayaURL.SetBasePath("http://192.168.15.39:8901/asset_platform", GameLayaExtend.AssetFolder);
+            // GameLayaURL.LoadExtReplaceConfig(Laya.Handler.create(null, () => {
+            //     GameLayaURL.InitCustomFormat();
+            //     Laya.loader.load("6.png", Laya.Handler.create(null, (tex) => {
+            //         material.albedoTexture = tex;
+            //     }));
+            // }));
+            // window['renderNum'] = 0;
         }
         onVersionLoaded() {
             Laya.AtlasInfoManager.enable("fileconfig.json", Laya.Handler.create(this, this.onConfigLoaded));

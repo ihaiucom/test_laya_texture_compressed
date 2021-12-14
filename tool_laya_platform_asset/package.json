@@ -20,7 +20,9 @@
   "dependencies": {
     "@types/node": "^16.11.6",
     "colors-console": "^1.0.3",
-    "commander": "^8.3.0"
+    "commander": "^8.3.0",
+    "gm": "^1.23.1",
+    "image-size": "^1.0.0"
   },
   "devDependencies": {}
 }

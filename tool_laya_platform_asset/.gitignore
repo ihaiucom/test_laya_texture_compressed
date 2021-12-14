@@ -2,6 +2,10 @@ test
 test2
 test3
 test5
-test*
+test*/
 node_modules
 package-lock.json
+tool/**.jpg
+tool/**.ktx
+tool/**.astc
+tool/**.png
