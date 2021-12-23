@@ -18,6 +18,7 @@ commander
     .command('compressed', '压缩图片.')
     .command('copyproject', '拷贝laya工程.')
     .command('imagesize', '输出图片大小.')
+    .command('filestatistics', '统计项目资源文件大小.')
     .parse(process.argv);
 
 const cmd = `
