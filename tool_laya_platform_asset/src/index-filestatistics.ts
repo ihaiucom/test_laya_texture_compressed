@@ -225,6 +225,66 @@ class FspriteassetsInfo {
     other = 0;
 }
 
+
+
+class MapInfo {
+    imgList: ImageInfo[] = [];
+    lhList: FileInfo[] = [];
+    lmatList: FileInfo[] = [];
+    otherList: FileInfo[] = [];
+
+    img = 0;
+    lh = 0;
+    lmat = 0;
+    other = 0;
+
+    get total() {
+        return this.img + this.lh + this.lmat + this.other;
+    }
+}
+
+
+class EffectModuleInfo {
+
+
+    imgList: ImageInfo[] = [];
+    lhList: FileInfo[] = [];
+    lmatList: FileInfo[] = [];
+    otherList: FileInfo[] = [];
+
+    img = 0;
+    lh = 0;
+    lmat = 0;
+    other = 0;
+
+
+    get moduletotal(): number {
+        return this.img + this.lh + this.lmat + this.other;
+    }
+
+}
+
+class EffectInfo extends EffectModuleInfo {
+
+    colorTexList: EffectModuleInfo = new EffectModuleInfo();
+    mainTexList: EffectModuleInfo = new EffectModuleInfo();
+    paramBinList: EffectModuleInfo = new EffectModuleInfo();
+
+    config_file: FileInfo = new FileInfo();
+
+
+
+    get total(): number {
+        return this.moduletotal
+            + this.colorTexList.moduletotal
+            + this.mainTexList.moduletotal
+            + this.paramBinList.moduletotal
+            + this.config_file.size;
+    }
+}
+
+
+
 class FguiModule {
     moduleName = "";
     binSize = 0;
@@ -295,6 +355,16 @@ class FileStatistics {
         }
 
 
+        var sheetName = '总大小';
+        var worksheet = workbook.getWorksheet(sheetName);
+        // if (!worksheet) {
+        //     worksheet = workbook.addWorksheet(sheetName);
+        // }
+        if (worksheet) {
+            workbook.removeWorksheet(sheetName);
+        }
+        worksheet = workbook.addWorksheet(sheetName);
+
         this.ReadFiles();
         await this.SheetTotal(workbook);
 
@@ -306,14 +376,12 @@ class FileStatistics {
 
         var sheetName = '总大小';
         var worksheet = workbook.getWorksheet(sheetName);
-        // if (!worksheet) {
-        //     worksheet = workbook.addWorksheet(sheetName);
-        // }
-        if (worksheet) {
-            workbook.removeWorksheet(sheetName);
+        if (!worksheet) {
+            worksheet = workbook.addWorksheet(sheetName);
         }
-
-        worksheet = workbook.addWorksheet(sheetName);
+        // if (worksheet) {
+        //     workbook.removeWorksheet(sheetName);
+        // }
 
         worksheet.columns = [
             { header: "类型", key: "Type", width: 15 },
@@ -338,11 +406,421 @@ class FileStatistics {
         this.ReadFgui(FileModule.Get(FileTotalType.ui) as FguiFileModuleInfo)
         this.ReadCharacter(FileModule.Get(FileTotalType.character) as GpuSkinningFileModuleInfo)
         this.ReadFspriteassets();
+        this.ReadMap();
+        this.ReadEffect();
     }
+
+
+    ReadEffect() {
+        var dir = path.join(inputPath, 'res3d/Conventional');
+        dir = dir.replace(/\\/g, '/');
+
+        var module = FileModule.Get(FileTotalType.fx)
+
+        var effectInfo = new EffectInfo();
+        this.ReadEffectDir(effectInfo, dir, inputPath);
+        this.ReadEffectExportResource(effectInfo);
+        module.total = effectInfo.total;
+
+
+        var sheetName = '特效-colorTex';
+        var worksheet = workbook.getWorksheet(sheetName);
+        if (worksheet) {
+            workbook.removeWorksheet(sheetName);
+        }
+        worksheet = workbook.addWorksheet(sheetName);
+
+        worksheet.columns = [
+            { header: "路径", key: "name", width: 30 },
+            { header: "大小(MB)", key: "size", width: 15 },
+            { header: "宽", key: "width", width: 15 },
+            { header: "高", key: "height", width: 15 },
+            { header: "内存(MB)", key: "height", width: 15 },
+        ];
+
+        var imgList = effectInfo.colorTexList.imgList;
+        var length = imgList.length;
+        for (var i = 0; i < length; i++) {
+            var imgInfo = imgList[i];
+            var row = worksheet.getRow(i + 2);
+            var c = 1;
+            row.getCell(c++).value = imgInfo.path;
+            row.getCell(c++).value = bToM(imgInfo.size);
+            row.getCell(c++).value = imgInfo.width;
+            row.getCell(c++).value = imgInfo.height;
+            row.getCell(c++).value = bToM(imgInfo.width * imgInfo.height * 4);
+        }
+
+
+        var sheetName = '特效-mainTex';
+        var worksheet = workbook.getWorksheet(sheetName);
+        if (worksheet) {
+            workbook.removeWorksheet(sheetName);
+        }
+        worksheet = workbook.addWorksheet(sheetName);
+
+        worksheet.columns = [
+            { header: "路径", key: "name", width: 30 },
+            { header: "大小(MB)", key: "size", width: 15 },
+            { header: "宽", key: "width", width: 15 },
+            { header: "高", key: "height", width: 15 },
+            { header: "内存(MB)", key: "height", width: 15 },
+        ];
+
+        var imgList = effectInfo.mainTexList.imgList;
+        var length = imgList.length;
+        for (var i = 0; i < length; i++) {
+            var imgInfo = imgList[i];
+            var row = worksheet.getRow(i + 2);
+            var c = 1;
+            row.getCell(c++).value = imgInfo.path;
+            row.getCell(c++).value = bToM(imgInfo.size);
+            row.getCell(c++).value = imgInfo.width;
+            row.getCell(c++).value = imgInfo.height;
+            row.getCell(c++).value = bToM(imgInfo.width * imgInfo.height * 4);
+        }
+
+
+        var sheetName = '特效-paramBin';
+        var worksheet = workbook.getWorksheet(sheetName);
+        if (worksheet) {
+            workbook.removeWorksheet(sheetName);
+        }
+        worksheet = workbook.addWorksheet(sheetName);
+
+        worksheet.columns = [
+            { header: "路径", key: "name", width: 30 },
+            { header: "大小(MB)", key: "size", width: 15 }
+        ];
+
+        var fileList = effectInfo.paramBinList.otherList;
+        var length = fileList.length;
+        for (var i = 0; i < length; i++) {
+            var fileInfo = fileList[i];
+            var row = worksheet.getRow(i + 2);
+            var c = 1;
+            row.getCell(c++).value = fileInfo.path;
+            row.getCell(c++).value = bToM(fileInfo.size);
+        }
+
+
+    }
+
+    ReadEffectExportResource(m: EffectInfo) {
+        var dir = path.join(inputPath, 'res3d/ExportResource/colorTex');
+        dir = dir.replace(/\\/g, '/');
+        this.ReadEffectImagDir(m.colorTexList, dir, inputPath);
+
+        var dir = path.join(inputPath, 'res3d/ExportResource/mainTex');
+        dir = dir.replace(/\\/g, '/');
+        this.ReadEffectImagDir(m.mainTexList, dir, inputPath);
+
+
+        var dir = path.join(inputPath, 'res3d/ExportResource/paramBin');
+        dir = dir.replace(/\\/g, '/');
+        this.ReadEffectImagDir(m.paramBinList, dir, inputPath);
+
+        var itemPath = path.join(inputPath, 'res3d/ExportResource/config_file.json');
+        itemPath = itemPath.replace(/\\/g, '/');
+        if (fs.existsSync(dir)) {
+            var stat = fs.lstatSync(dir);
+            var info = m.config_file;
+            info.path = path.relative(inputPath, itemPath).replace(/\\/g, '/');
+            info.size = stat.size;
+        }
+
+
+
+
+    }
+
+    ReadEffectImagDir(m: EffectModuleInfo, dir: string, root: string) {
+        var paths = fs.readdirSync(dir); //同步读取当前目录
+        for (var i = 0, len = paths.length; i < len; i++) {
+            var name = paths[i];
+
+            var itemPath = path.join(dir, name);
+            itemPath = itemPath.replace(/\\/g, '/');
+
+            var stat = fs.lstatSync(itemPath);
+            if (stat.isFile()) {
+                var ext = path.extname(itemPath);
+                ext = ext.toLowerCase();
+                switch (ext) {
+                    case ".png":
+                    case ".jpg":
+                    case ".jpeg":
+                        var img = new ImageInfo();
+                        img.path = path.relative(root, itemPath).replace(/\\/g, '/');
+                        img.size = stat.size;
+                        m.img += stat.size;
+                        var imgInfo = imagesize(itemPath);
+                        img.width = imgInfo.width as number;
+                        img.height = imgInfo.height as number;
+                        m.imgList.push(img);
+                        break;
+                    default:
+                        var info = new FileInfo();
+                        info.path = path.relative(root, itemPath).replace(/\\/g, '/');
+                        info.size = stat.size;
+                        switch (ext) {
+                            case ".lmat":
+                                m.lmat += stat.size;
+                                m.lmatList.push(info);
+                                break;
+                            case ".lh":
+                                m.lh += stat.size;
+                                m.lhList.push(info);
+                                break;
+                            default:
+                                m.other += stat.size;
+                                m.otherList.push(info);
+                                break;
+                        }
+                        break;
+                }
+
+            }
+            else if (stat.isDirectory()) {
+                // this.ReadMapDir(m, itemPath, root);
+            }
+
+        }
+    }
+
+
+
+    ReadEffectDir(m: EffectInfo, dir: string, root: string) {
+
+
+        var paths = fs.readdirSync(dir); //同步读取当前目录
+        for (var i = 0, len = paths.length; i < len; i++) {
+            var name = paths[i];
+
+            if (name.indexOf('sfx') != 0) {
+                continue;
+            }
+
+            var itemPath = path.join(dir, name);
+            itemPath = itemPath.replace(/\\/g, '/');
+
+            var stat = fs.lstatSync(itemPath);
+            if (stat.isFile()) {
+                var ext = path.extname(itemPath);
+                ext = ext.toLowerCase();
+                switch (ext) {
+                    case ".png":
+                    case ".jpg":
+                    case ".jpeg":
+                        var img = new ImageInfo();
+                        img.path = path.relative(root, itemPath).replace(/\\/g, '/');
+                        img.size = stat.size;
+                        m.img += stat.size;
+                        var imgInfo = imagesize(itemPath);
+                        img.width = imgInfo.width as number;
+                        img.height = imgInfo.height as number;
+                        m.imgList.push(img);
+                        break;
+                    default:
+                        var info = new FileInfo();
+                        info.path = path.relative(root, itemPath).replace(/\\/g, '/');
+                        info.size = stat.size;
+                        switch (ext) {
+                            case ".lmat":
+                                m.lmat += stat.size;
+                                m.lmatList.push(info);
+                                break;
+                            case ".lh":
+                                m.lh += stat.size;
+                                m.lhList.push(info);
+                                break;
+                            default:
+                                m.other += stat.size;
+                                m.otherList.push(info);
+                                break;
+                        }
+                        break;
+                }
+
+            }
+            else if (stat.isDirectory()) {
+                // this.ReadMapDir(m, itemPath, root);
+            }
+
+        }
+    }
+
 
     ReadMap() {
+        var dir = path.join(inputPath, 'res3d/Conventional');
+        dir = dir.replace(/\\/g, '/');
 
+        var module = FileModule.Get(FileTotalType.map)
+
+        var mapInfo = new MapInfo();
+        this.ReadMapDir(mapInfo, dir, inputPath);
+        module.total = mapInfo.total;
+
+
+        var sheetName = '地图-图片';
+        var worksheet = workbook.getWorksheet(sheetName);
+        if (worksheet) {
+            workbook.removeWorksheet(sheetName);
+        }
+        worksheet = workbook.addWorksheet(sheetName);
+
+        worksheet.columns = [
+            { header: "路径", key: "name", width: 30 },
+            { header: "大小(MB)", key: "size", width: 15 },
+            { header: "宽", key: "width", width: 15 },
+            { header: "高", key: "height", width: 15 },
+            { header: "内存(MB)", key: "height", width: 15 },
+        ];
+
+        var imgList = mapInfo.imgList;
+        var length = imgList.length;
+        for (var i = 0; i < length; i++) {
+            var imgInfo = imgList[i];
+            var row = worksheet.getRow(i + 2);
+            var c = 1;
+            row.getCell(c++).value = imgInfo.path;
+            row.getCell(c++).value = bToM(imgInfo.size);
+            row.getCell(c++).value = imgInfo.width;
+            row.getCell(c++).value = imgInfo.height;
+            row.getCell(c++).value = bToM(imgInfo.width * imgInfo.height * 4);
+        }
+
+
+        var sheetName = '地图-材质';
+        var worksheet = workbook.getWorksheet(sheetName);
+        if (worksheet) {
+            workbook.removeWorksheet(sheetName);
+        }
+        worksheet = workbook.addWorksheet(sheetName);
+
+        worksheet.columns = [
+            { header: "路径", key: "name", width: 30 },
+            { header: "大小(MB)", key: "size", width: 15 }
+        ];
+
+        var fileList = mapInfo.lmatList;
+        var length = fileList.length;
+        for (var i = 0; i < length; i++) {
+            var fileInfo = fileList[i];
+            var row = worksheet.getRow(i + 2);
+            var c = 1;
+            row.getCell(c++).value = fileInfo.path;
+            row.getCell(c++).value = bToM(fileInfo.size);
+        }
+
+
+        var sheetName = '地图-预设';
+        var worksheet = workbook.getWorksheet(sheetName);
+        if (worksheet) {
+            workbook.removeWorksheet(sheetName);
+        }
+        worksheet = workbook.addWorksheet(sheetName);
+
+        worksheet.columns = [
+            { header: "路径", key: "name", width: 30 },
+            { header: "大小(MB)", key: "size", width: 15 }
+        ];
+
+        var fileList = mapInfo.lhList;
+        var length = fileList.length;
+        for (var i = 0; i < length; i++) {
+            var fileInfo = fileList[i];
+            var row = worksheet.getRow(i + 2);
+            var c = 1;
+            row.getCell(c++).value = fileInfo.path;
+            row.getCell(c++).value = bToM(fileInfo.size);
+        }
+
+        if (mapInfo.otherList.length > 0) {
+
+            var sheetName = '地图-其他';
+            var worksheet = workbook.getWorksheet(sheetName);
+            if (worksheet) {
+                workbook.removeWorksheet(sheetName);
+            }
+            worksheet = workbook.addWorksheet(sheetName);
+
+            worksheet.columns = [
+                { header: "路径", key: "name", width: 30 },
+                { header: "大小(MB)", key: "size", width: 15 }
+            ];
+
+            var fileList = mapInfo.otherList;
+            var length = fileList.length;
+            for (var i = 0; i < length; i++) {
+                var fileInfo = fileList[i];
+                var row = worksheet.getRow(i + 2);
+                var c = 1;
+                row.getCell(c++).value = fileInfo.path;
+                row.getCell(c++).value = bToM(fileInfo.size);
+            }
+        }
     }
+
+    ReadMapDir(m: MapInfo, dir: string, root: string) {
+
+
+        var paths = fs.readdirSync(dir); //同步读取当前目录
+        for (var i = 0, len = paths.length; i < len; i++) {
+            var name = paths[i];
+            if (name.indexOf('sfx') == 0) {
+                continue;
+            }
+
+            var itemPath = path.join(dir, name);
+            itemPath = itemPath.replace(/\\/g, '/');
+
+            var stat = fs.lstatSync(itemPath);
+            if (stat.isFile()) {
+                var ext = path.extname(itemPath);
+                ext = ext.toLowerCase();
+                switch (ext) {
+                    case ".png":
+                    case ".jpg":
+                    case ".jpeg":
+                        var img = new ImageInfo();
+                        img.path = path.relative(root, itemPath).replace(/\\/g, '/');
+                        img.size = stat.size;
+                        m.img += stat.size;
+                        var imgInfo = imagesize(itemPath);
+                        img.width = imgInfo.width as number;
+                        img.height = imgInfo.height as number;
+                        m.imgList.push(img);
+                        break;
+                    default:
+                        var info = new FileInfo();
+                        info.path = path.relative(root, itemPath).replace(/\\/g, '/');
+                        info.size = stat.size;
+                        switch (ext) {
+                            case ".lmat":
+                                m.lmat += stat.size;
+                                m.lmatList.push(info);
+                                break;
+                            case ".lh":
+                                m.lh += stat.size;
+                                m.lhList.push(info);
+                                break;
+                            default:
+                                m.other += stat.size;
+                                m.otherList.push(info);
+                                break;
+                        }
+                        break;
+                }
+
+            }
+            else if (stat.isDirectory()) {
+                this.ReadMapDir(m, itemPath, root);
+            }
+
+        }
+    }
+
 
     ReadFgui(f: FguiFileModuleInfo) {
         var map = f.map;

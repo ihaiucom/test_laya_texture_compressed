@@ -1318,8 +1318,10 @@ window.Laya = (function (exports) {
         static destroyUnusedResources() {
             for (var k in Resource._idResourcesMap) {
                 var res = Resource._idResourcesMap[k];
-                if (!res.lock && res._referenceCount === 0)
+                if (!res.lock && res._referenceCount === 0) {
+                    // console.log("destroyUnusedResources", res._url);
                     res.destroy();
+                }
             }
         }
         get id() {
@@ -2366,11 +2368,6 @@ window.Laya = (function (exports) {
     class Texture2D extends BaseTexture {
         constructor(width = 0, height = 0, format = exports.TextureFormat.R8G8B8A8, mipmap = true, canRead = false) {
             super(format, mipmap);
-
-            // TODO TEST
-            if (width == 512 && height == 256) {
-                console.log(this);
-            }
             var gl = LayaGL.instance;
             this._glTextureType = gl.TEXTURE_2D;
             this._width = width;
@@ -5834,8 +5831,9 @@ window.Laya = (function (exports) {
             this._vao.bind();
             this._vb._bindForVAO();
             // TODO ZF Chrome 96 注释掉下面两行
-            // this._ib.setNeedUpload();	//vao的话，必须要绑定ib。即使是共享的别人的。
+            // this._ib.setNeedUpload();
             // this._ib._bind_uploadForVAO();
+
             var attribNum = this._attribInfo.length / 3;
             var idx = 0;
             for (var i = 0; i < attribNum; i++) {
@@ -5852,7 +5850,6 @@ window.Laya = (function (exports) {
             this._applied || this.configVAO(gl);
             this._vao.bind();
             this._vb.bind();
-
             // TODO ZF Chrome 96 修改前
             // this._ib._bind_upload() || this._ib.bind();
             // TODO ZF Chrome 96 修改后
@@ -7618,10 +7615,6 @@ window.Laya = (function (exports) {
     class Texture extends EventDispatcher {
         constructor(bitmap = null, uv = null, sourceWidth = 0, sourceHeight = 0) {
             super();
-            // TODO TEST
-            if (sourceWidth == 512) {
-                console.log(this);
-            }
             this.uvrect = [0, 0, 1, 1];
             this._destroyed = false;
             this._referenceCount = 0;
@@ -19260,11 +19253,7 @@ window.Laya = (function (exports) {
             var cacheRes;
             if (type == Loader.IMAGE) {
                 cacheRes = Loader.textureMap[url];
-                // TODO ZF 加载贴图时，贴图先缓存了实际没加载情况
-                if (cacheRes && !cacheRes.bitmap) {
-                    cacheRes = null;
-                }
-                else if (cacheRes && cacheRes.bitmap && cacheRes.bitmap.destroyed) {
+                if (cacheRes && cacheRes.bitmap && cacheRes.bitmap.destroyed) {
                     cacheRes = null;
                 }
             }
@@ -19422,6 +19411,10 @@ window.Laya = (function (exports) {
             this.event(Event.ERROR, message);
         }
         onLoaded(data = null) {
+
+            if (this.url.indexOf("map_Chjxyfj_ground_01") != -1) {
+                console.log("zzzz onLoaded", this.url);
+            }
             var type = this._type;
             if (type == Loader.PLFB) {
                 this.parsePLFBData(data);
@@ -19432,6 +19425,10 @@ window.Laya = (function (exports) {
                 this.complete(data);
             }
             else if (type === Loader.IMAGE) {
+
+                if (this.url.indexOf("map_Chjxyfj_ground_01") != -1) {
+                    console.log("zzzz img", this.url);
+                }
                 let tex;
                 if (data instanceof ArrayBuffer) {
                     // TODO ZF 替换后缀
@@ -19978,6 +19975,8 @@ window.Laya = (function (exports) {
             }
         }
         load(url, complete = null, progress = null, type = null, priority = 1, cache = true, group = null, ignoreCache = false, useWorkerLoader = ILaya.WorkerLoader.enable) {
+            if (url.indexOf("1.jpg") != -1)
+                console.error(url);
             if (url instanceof Array) {
                 return this._loadAssets(url, complete, progress, type, priority, cache, group);
             }
@@ -19997,10 +19996,6 @@ window.Laya = (function (exports) {
             else
                 content = Loader.loadedMap[URL.formatURL(url)];
             if (!ignoreCache && content != null) {
-                // TODO ZF 加载贴图时，用缓存但实际没加载
-                if (!content.bitmap) {
-                    console.error("用缓存但实际没加载", url, content);
-                }
                 ILaya.systemTimer.callLater(this, function () {
                     progress && progress.runWith(1);
                     complete && complete.runWith(content instanceof Array ? [content] : content);

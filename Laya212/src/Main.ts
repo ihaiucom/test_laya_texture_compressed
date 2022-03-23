@@ -1,3 +1,4 @@
+import { DebugMemory } from "./Debug/DebugMemory";
 import TestButtonBinder from "./fgui/TestButton/TestButtonBinder";
 import UI_TestButtonPanel from "./fgui/TestButton/UI_TestButtonPanel";
 import GameConfig from "./GameConfig";
@@ -8,6 +9,7 @@ class Main {
 	scene: TestScene;
 	constructor() {
 
+		window['debugMemory'] = DebugMemory;
 
 		//根据IDE设置初始化引擎		
 		if (window["Laya3D"]) Laya3D.init(GameConfig.width, GameConfig.height);
@@ -46,6 +48,8 @@ class Main {
 
 		var types = [png, astc, ktx, ktx1, ktxr, dds];
 		var names = ["png", "astc", "ktx", "ktx1", "ktxr", 'dds'];
+
+		window['types'] = types;
 
 		fgui.UIPackage.loadPackage("fgui/TestButton", Laya.Handler.create(this, () => {
 			var testPanel = UI_TestButtonPanel.createInstance();

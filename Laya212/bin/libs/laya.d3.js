@@ -29987,22 +29987,26 @@
 					// TODO ZF dds图片
 					(!loader._constructParams) && (loader._constructParams = []);
 					loader._constructParams[2] = Laya.TextureFormat.DDSTEXTURE;
+					loader._constructParams[3] = false;
 					break;
 				case "ktx":
 					type = Laya.Loader.BUFFER;
 					(!loader._constructParams) && (loader._constructParams = []);
 					loader._constructParams[2] = Laya.TextureFormat.KTXTEXTURE;
+					loader._constructParams[3] = false;
 					break;
 				case "pvr":
 					type = Laya.Loader.BUFFER;
 					(!loader._constructParams) && (loader._constructParams = []);
 					loader._constructParams[2] = Laya.TextureFormat.PVRTEXTURE;
+					loader._constructParams[3] = false;
 					break;
 				// TODO ZF astc图片
 				case "astc":
 					type = Laya.Loader.BUFFER;
 					(!loader._constructParams) && (loader._constructParams = []);
 					loader._constructParams[2] = Laya.TextureFormat.ASTCTEXTURE;
+					loader._constructParams[3] = false;
 					break;
 			}
 			loader.on(Laya.Event.LOADED, null, function (image) {

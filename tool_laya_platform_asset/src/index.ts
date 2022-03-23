@@ -15,6 +15,7 @@ commander
     .command('copyimage', '拷贝图片.')
     .command('copyimagefromunity', '拷贝图片从unity拷贝.')
     .command('resize', '缩放图片.')
+    .command('resize4mul', '缩放图片4的倍数.')
     .command('compressed', '压缩图片.')
     .command('copyproject', '拷贝laya工程.')
     .command('imagesize', '输出图片大小.')

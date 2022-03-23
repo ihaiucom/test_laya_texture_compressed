@@ -76,6 +76,7 @@ export class AssetSettingManager {
     }
 
     GetFieldValue(imageSrcPath: string, platform: string) {
+        return "astc_high"
         var value = this.csv.GetFieldValue(imageSrcPath, platform);
         if (value == null) {
             value = this.csv.GetFieldValue("default", platform);

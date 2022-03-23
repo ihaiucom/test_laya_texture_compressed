@@ -13,6 +13,7 @@ Example
 tool-laya-platform resize  -s '50%' ./test/platform_asset/default_high ./test/platform_asset/default_middle
 
 ts-node ./src/index.ts resize -s '50%' -q 70 -i ./test/platform_asset/default_high -o ./test/platform_asset/default_middle
+ts-node ./src/index.ts resize -s '50%' -q 70 -i D:/zengfeng/GameJJSG2021/client/laya/bin/res3d/Conventional\Assets/jjsg_resources/prefab_scene -o D:/zengfeng/GameJJSG2021/client/laya/bin/res3d/Conventional\Assets/jjsg_resources/prefab_scene2
     `)
     .option("-s, --size <size>", "大小")
     .option("-q, --quality <quality>", "质量")

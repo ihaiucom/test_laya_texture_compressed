@@ -23,6 +23,7 @@ export class Tool {
     static async Image2AstcSync(inPath: string, outPath: string, modes: EnumAstcMode = EnumAstcMode.cl, blockSize: EnumAstcBlockSize = EnumAstcBlockSize.size_8x8, speed: EnumAstcSpeed = EnumAstcSpeed.fast): Promise<boolean> {
         FileUtils.checkDirPath(outPath);
         const tool = "astcenc-sse2.exe";
+        // let param = [modes, inPath, outPath, blockSize, speed, '-pp-premultiply'];
         let param = [modes, inPath, outPath, blockSize, speed];
         return await this.RunToolSync(tool, param);
     }
@@ -31,7 +32,9 @@ export class Tool {
     static async Image2PvrSync(inPath: string, outPath: string, format: EnumPvrFormat = EnumPvrFormat.PVRTC1_2, quality: EnumPvrQuality = EnumPvrQuality.pvrtcfast, pot = "-", square: string = "-"): Promise<boolean> {
         FileUtils.checkDirPath(outPath);
         const tool = "PVRTexToolCLI.exe";
-        let param = [`-i ${inPath}`, `-o ${outPath}`, `-f ${format},UBN,lRGB`, `-q ${quality}`, `-pot ${pot}`, `-square ${square}`];
+        // let param = [`-i ${inPath}`, `-o ${outPath}`, `-f ${format},UBN,lRGB`, `-q ${quality}`, `-pot ${pot}`, `-square ${square}`, '-p'];
+
+        let param = [`-i ${inPath}`, `-o ${outPath}`, `-f ${format},UBN,lRGB`, `-q ${quality}`, '-p'];
         return await this.RunToolSync(tool, param);
     }
 

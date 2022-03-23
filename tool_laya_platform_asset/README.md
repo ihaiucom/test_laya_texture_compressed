@@ -18,6 +18,8 @@ XCOPY /S/Y D:\zengfeng\GameJJSG2021\client\laya\bin\**.jpg .\test\platform_asset
 XCOPY /S/Y ..\Laya212\bin\**.png .\test2\platform_asset\default_high
 XCOPY /S/Y ..\Laya212\**.jpg .\test2\platform_asset\default_high
 
+XCOPY /S/Y D:\zengfeng\GameJJSG2021\scene_res\prefab_scene\**.lmat D:\zengfeng\GameJJSG2021\client\laya\bin\res3d\Conventional\Assets\jjsg_resources\prefab_scene
+
 
 ts-node ./src/index.ts copyimage -i ../Laya212/bin -o ./test2/platform_asset/default_high
 ts-node ./src/index.ts resize -s '50%' -q 70 -i ./test2/platform_asset/default_high -o ./test2/platform_asset/default_middle
